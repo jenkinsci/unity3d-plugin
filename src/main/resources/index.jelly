@@ -1,0 +1,6 @@
+<!--
+  This view is used to render the installed plugins page.
+-->
+<div>
+  This plugin is a plugin to execute Unity3d builds. See <a href="http://unity3d.com">Unity 3d</a>
+</div>
