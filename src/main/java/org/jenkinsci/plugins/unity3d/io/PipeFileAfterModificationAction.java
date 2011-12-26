@@ -67,8 +67,14 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                     raf = new RandomAccessFile(path, "r");
                 }
             } finally {
-                pos = raf.getFilePointer();
-                raf.close();
+                try {
+                    pos = raf.getFilePointer();
+                } catch (IOException e) {
+                }
+                try {
+                    raf.close();
+                } catch (IOException e) {
+                }
                 if (closeOut)
                     out.close();
             }
