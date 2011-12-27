@@ -103,6 +103,10 @@ public class Unity3dBuilder extends Builder {
                 return true;
             } finally {
                 if (!futureReadBytes.isDone()) {
+                    // NOTE According to the API, cancel() should cause future calls to get() to fail with an exception
+                    // Jenkins implementation doesn't seem to record it right now and just interrupts the remote task
+                    // but we won't use the value, in case that behavior changes, even for debugging / informative purposes
+                    // we still call cancel to stop the task.
                     boolean cancel = futureReadBytes.cancel(true);
                     // listener.getLogger().print("Read " + futureReadBytes.get() + " bytes from Editor.log");
                 }

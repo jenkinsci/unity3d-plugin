@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
  * <p>
  * Useful when the file is been modified and one needs to loop.
  * <p>
- * Note that you will have to interrupt this task to cancel it.
+ * Note that you can interrupt this task to cancel it.
  *
  * @author Jerome Lacoste
  */
@@ -55,6 +55,7 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                         out.write(buf, 0, len);
 
                     pos = raf.getFilePointer();
+                    raf.close();
 
                     synchronized (this) {
                         try {
@@ -63,7 +64,6 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                             break;
                         }
                     }
-                    raf.close();
                     raf = new RandomAccessFile(path, "r");
                 }
             } finally {

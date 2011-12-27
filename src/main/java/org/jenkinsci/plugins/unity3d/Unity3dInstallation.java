@@ -79,7 +79,9 @@ public class Unity3dInstallation
     }
 
     /**
-     * Create a long running task that pipes the Unity3d editor.log into the specified pipe
+     * Create a long running task that pipes the Unity3d editor.log into the specified pipe.
+     * <p>
+     * This future can be {@link Future#cancel(boolean) cancelled} in order for the pipe to be closed properly.
      * @param launcher
      * @param pipe
      * @return the number of bytes read
@@ -88,8 +90,7 @@ public class Unity3dInstallation
     public Future<Long> pipeEditorLog(final Launcher launcher, final Pipe pipe) throws IOException {
         return launcher.getChannel().callAsync(new Callable<Long, IOException>() {
             public Long call() throws IOException {
-                PipeFileAfterModificationAction action = new PipeFileAfterModificationAction(getEditorLogFile().getAbsolutePath(), pipe.getOut(), true);
-                return action.call();
+                return new PipeFileAfterModificationAction(getEditorLogFile().getAbsolutePath(), pipe.getOut(), true).call();
             }
         });
     }
