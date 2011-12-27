@@ -53,7 +53,6 @@ public class Unity3dBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
 
-        ArgumentListBuilder args = new ArgumentListBuilder();
         EnvVars env = build.getEnvironment(listener);
 
         Unity3dInstallation ai = getUnity3dInstallation();
@@ -77,16 +76,13 @@ public class Unity3dBuilder extends Builder {
             return false;
         }
         FilePath moduleRoot = build.getModuleRoot();
+        String moduleRootRemote = moduleRoot.getRemote();
         if (!moduleRoot.child("Assets").exists()) {
-            listener.fatalError(Messages.Unity3d_MissingAssetsNotUnity3dHomeDirectory(moduleRoot.getRemote()));
+            listener.fatalError(Messages.Unity3d_MissingAssetsNotUnity3dHomeDirectory(moduleRootRemote));
             return false;
         }
 
-        args.add(exe);
-        args.add("-projectpath", moduleRoot.getRemote());
-        args.add("-quit");
-        args.add("-batchmode");
-        args.add("-executeMethod", executeMethod);
+        ArgumentListBuilder args = createCommandLineArgs(exe, moduleRootRemote, executeMethod);
         
         try {
             Pipe pipe = Pipe.createRemoteToLocal();
@@ -123,6 +119,16 @@ public class Unity3dBuilder extends Builder {
             e.printStackTrace(listener.fatalError(errorMessage));
             return false;
         }
+    }
+
+    private ArgumentListBuilder createCommandLineArgs(String exe, String moduleRootRemote, final String executeMethod) {
+        ArgumentListBuilder args = new ArgumentListBuilder();
+        args.add(exe);
+        args.add("-projectpath", moduleRootRemote);
+        args.add("-quit");
+        args.add("-batchmode");
+        args.add("-executeMethod", executeMethod);
+        return args;
     }
 
     /**
