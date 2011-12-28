@@ -2,21 +2,14 @@ package org.jenkinsci.plugins.unity3d.io;
 
 import com.google.common.io.Files;
 import hudson.util.ByteArrayOutputStream2;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PipeFileAfterModificationActionTest {
     private String originalContent = "The original content of the file\n" 
@@ -58,9 +51,9 @@ public class PipeFileAfterModificationActionTest {
         fakeEditorLog.renameTo(prevEditorLog);
 
         Files.write(newContent, fakeEditorLog, UTF_8);
-        Thread.sleep(100);
+        Thread.sleep(20);
         Files.append(newContent2, fakeEditorLog, UTF_8);
-        Thread.sleep(200);
+        Thread.sleep(80);
         String expectedContent = newContent + newContent2;
 
         // simulate remote cancellation. Using the remoting API, we cancel the task and this interrupts the remote thread
