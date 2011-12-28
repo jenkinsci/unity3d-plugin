@@ -44,9 +44,10 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
         File file = new DetectFileCreatedOrModifiedAction(path).call();
         long pos = 0;
         if (file != null) {
-            RandomAccessFile raf = new RandomAccessFile(path, "r");
+            RandomAccessFile raf = null;
             try {
                 while (true) {
+                    raf = new RandomAccessFile(path, "r");
                     raf.seek(pos);
 
                     byte[] buf = new byte[8192];
@@ -64,16 +65,17 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                             break;
                         }
                     }
-                    raf = new RandomAccessFile(path, "r");
                 }
             } finally {
-                try {
-                    pos = raf.getFilePointer();
-                } catch (IOException e) {
-                }
-                try {
-                    raf.close();
-                } catch (IOException e) {
+                if (raf != null) {
+                    try {
+                        pos = raf.getFilePointer();
+                    } catch (IOException ignore) {
+                    }
+                    try {
+                        raf.close();
+                    } catch (IOException ignore) {
+                    }
                 }
                 if (closeOut)
                     out.close();
