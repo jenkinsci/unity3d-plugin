@@ -1,24 +1,20 @@
 package org.jenkinsci.plugins.unity3d;
 
 import hudson.Launcher;
-import hudson.remoting.Callable;
-import hudson.remoting.Future;
-import hudson.remoting.Pipe;
-import hudson.remoting.VirtualChannel;
+import hudson.remoting.*;
 import hudson.slaves.DumbSlave;
 import hudson.util.StreamCopyThread;
 import hudson.util.StreamTaskListener;
 import org.jvnet.hudson.test.HudsonTestCase;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @see ProcTest in Jenkins
+ * This test was written to find a solution to the piping issue. The Pipe class in Jenkins 1.446 doesn't work properly with asyncCall if the master and slave are on the same machine.
+ *
+ * See ProcTest in Jenkins for similar class
  * @author Jerome Lacoste
  */
 public class PipingTest extends HudsonTestCase implements Serializable {
@@ -44,13 +40,17 @@ public class PipingTest extends HudsonTestCase implements Serializable {
                 createSlaveChannel(), true));
     }
 
-
-
     private void doPipingFromRemoteTest(Launcher l) throws IOException, InterruptedException, ExecutionException {
-        final Pipe p = Pipe.createRemoteToLocal();
-        Future<String> piping = l.getChannel().callAsync(new PipingCallable(p));
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream(pis);
+
+        boolean isLocal = l instanceof Launcher.LocalLauncher;
+        System.out.println("IS LOCAL " + isLocal);
+        OutputStream ros = new RemoteOutputStream(pos);
+
+        Future<String> piping = l.getChannel().callAsync(new PipingCallable(ros));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Thread t = new StreamCopyThread("Test", p.getIn(), os);
+        Thread t = new StreamCopyThread("Test", pis, os);
         t.start();
         
         assertEquals("DONE", piping.get());
@@ -60,14 +60,13 @@ public class PipingTest extends HudsonTestCase implements Serializable {
     }
 
     private static class PipingCallable implements Callable<String, Throwable>, Serializable {
-        private final Pipe p;
+        private final OutputStream out;
 
-        public PipingCallable(Pipe p) {
-            this.p = p;
+        public PipingCallable(OutputStream out) {
+            this.out = out;
         }
 
         public String call() throws Throwable {
-            OutputStream out = p.getOut();
             if (out == null) {
                 throw new IllegalStateException("null output");
             }
