@@ -1,7 +1,9 @@
-package org.jenkinsci.plugins.unity3d;
+package org.jenkinsci.plugins.unity3d.io;
 
 import hudson.Launcher;
-import hudson.remoting.*;
+import hudson.remoting.Callable;
+import hudson.remoting.Future;
+import hudson.remoting.VirtualChannel;
 import hudson.slaves.DumbSlave;
 import hudson.util.StreamCopyThread;
 import hudson.util.StreamTaskListener;
@@ -17,7 +19,7 @@ import java.util.concurrent.ExecutionException;
  * See ProcTest in Jenkins for similar class
  * @author Jerome Lacoste
  */
-public class PipingTest extends HudsonTestCase implements Serializable {
+public class PipeTest extends HudsonTestCase implements Serializable {
 
     private VirtualChannel createSlaveChannel() throws Exception {
         DumbSlave s = createSlave();
@@ -41,16 +43,10 @@ public class PipingTest extends HudsonTestCase implements Serializable {
     }
 
     private void doPipingFromRemoteTest(Launcher l) throws IOException, InterruptedException, ExecutionException {
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream(pis);
-
-        boolean isLocal = l instanceof Launcher.LocalLauncher;
-        System.out.println("IS LOCAL " + isLocal);
-        OutputStream ros = new RemoteOutputStream(pos);
-
-        Future<String> piping = l.getChannel().callAsync(new PipingCallable(ros));
+        Pipe pipe = Pipe.createRemoteToLocal(l);
+        Future<String> piping = l.getChannel().callAsync(new PipingCallable(pipe.getOut()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Thread t = new StreamCopyThread("Test", pis, os);
+        Thread t = new StreamCopyThread("Test", pipe.getIn(), os);
         t.start();
         
         assertEquals("DONE", piping.get());

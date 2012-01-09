@@ -7,7 +7,6 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Computer;
-import hudson.remoting.RemoteOutputStream;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
@@ -16,6 +15,7 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractProject;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
+import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -86,20 +86,16 @@ public class Unity3dBuilder extends Builder {
         }
 
         ArgumentListBuilder args = createCommandLineArgs(exe, moduleRootRemote, executeMethod);
-        
-        try {
-            PipedInputStream is = new PipedInputStream();
-            PipedOutputStream pos = new PipedOutputStream(is);
 
-            boolean isLocal = launcher instanceof Launcher.LocalLauncher;
-            OutputStream os = isLocal ? pos : new RemoteOutputStream(pos);
+        try {
+            Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
             PrintStream ca = listener.getLogger();
             ca.println("Piping unity Editor.log from " + ai.getEditorLogPath(launcher));
-            Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, os);
+            Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, pipe.getOut());
             // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
-            StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", is, ca);
+            StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
             int r;
             try {
                 copierThread.start();
