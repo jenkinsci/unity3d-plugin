@@ -111,12 +111,12 @@ public class Unity3dInstallation
     }
 
     private File getEditorLogFile() {
-        String userhome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
         if (Functions.isWindows()) {
             File applocaldata = new File(EnvVars.masterEnvVars.get("LOCALAPPDATA"));
             return new File(applocaldata, "Unity/Editor/Editor.log");
         } else { // mac assumed
-            return new File(userhome, "Library/Unity/Editor.log");
+            File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
+            return new File(userhome, "Library/Logs/Unity/Editor.log");
         }
     }
 
