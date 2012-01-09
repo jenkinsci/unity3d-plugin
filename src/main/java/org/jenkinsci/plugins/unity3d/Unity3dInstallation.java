@@ -66,15 +66,15 @@ public class Unity3dInstallation
     }
 
     private File getExeFile() {
-        String home = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
-        return getExeFile(new File(home));
+        String unityHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
+        return getExeFile(new File(unityHome));
     }
 
-    private static File getExeFile(File home) {
+    private static File getExeFile(File unityHome) {
         if (Functions.isWindows()) {
-            return new File(home, "Editor/Unity.exe");
+            return new File(unityHome, "Editor/Unity.exe");
         } else { // mac assumed
-            return new File(home, "Contents/MacOS/Unity");
+            return new File(unityHome, "Contents/MacOS/Unity");
         }
     }
 
