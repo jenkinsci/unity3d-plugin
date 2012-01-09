@@ -12,7 +12,7 @@ Automating Unity3d builds from the command line is [possible](http://unity3d.com
 * tool and file locations are platform specific
 * only one project can be built at a time per machine
 
-This plugin aims to make it easier to run Unity3d builds easily in Jenkins, by adding the following features
+This plugin aims to make it easier to run Unity3d builds easily in Jenkins, by adding the following features:
 
 * log file redirection
 
@@ -20,19 +20,31 @@ More to come...
 
 The plugin was tested with unity3d 3.4.2 and unity3d 3.5 beta. Tested on distributed and single server environments
 
+License
+-------
+
+MIT
+
+Building
+--------
+
+If you wish to build from source
+
+mvn install
 
 Installing
 ----------
 
 Follow (https://wiki.jenkins-ci.org/display/JENKINS/Plugins)
 
-Building
---------
-
-mvn install
-
 Links
 -----
 
-* (https://github.com/mcmarkb/Teamcity-unity3d-build-runner-plugin)
+* for those using Teamcity, use https://github.com/mcmarkb/Teamcity-unity3d-build-runner-plugin
 
+Contact
+-------
+
+jerome.lacoste@gmail.com
+
+Pull requests appreciated !
