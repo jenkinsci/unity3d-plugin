@@ -69,7 +69,7 @@ public class Unity3dBuilder extends Builder {
             return false;
         } catch (IOException e) {
             Util.displayIOException(e, listener);
-            String errorMessage = Messages.Unity3d_ExecFailed();
+            String errorMessage = Messages.Unity3d_ExecUnexpectedlyFailed();
             e.printStackTrace(listener.fatalError(errorMessage));
             return false;
         }
