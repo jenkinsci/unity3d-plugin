@@ -16,13 +16,16 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractProject;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.util.StreamCopyThread;
+import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.concurrent.Future;
 
 /**
@@ -116,6 +119,10 @@ public class Unity3dBuilder extends Builder {
                 }
                 try {
                     copierThread.join();
+                    if (copierThread.getFailure() != null) {
+                       ca.println("Failure on remote ");
+                       copierThread.getFailure().printStackTrace(ca);
+                    }
                 }
                 finally {
                     //ca.forceEol();
