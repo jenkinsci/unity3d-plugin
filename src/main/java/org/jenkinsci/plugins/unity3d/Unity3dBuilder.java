@@ -52,17 +52,36 @@ public class Unity3dBuilder extends Builder {
     public String getUnity3dName() {
         return unity3dName;
     }
-
+    
+    private static class PerformException extends Exception {
+        private PerformException(String s) {
+            super(s);
+        }
+    }
+    
     @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException {
+        try {
+            _perform(build, launcher, listener);
+            return true;
+        } catch (PerformException e) {
+            listener.fatalError(e.getMessage());
+            return false;
+        } catch (IOException e) {
+            Util.displayIOException(e, listener);
+            String errorMessage = Messages.Unity3d_ExecFailed();
+            e.printStackTrace(listener.fatalError(errorMessage));
+            return false;
+        }
+    }
 
+    private void _perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
 
         Unity3dInstallation ai = getUnity3dInstallation();
 
         if(ai==null) {
-            listener.fatalError(Messages.Unity3d_NoUnity3dInstallation());
-            return false;
+            throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
         }
 
         ai = ai.forNode(Computer.currentComputer().getNode(), listener);
@@ -70,67 +89,55 @@ public class Unity3dBuilder extends Builder {
 
         String exe = ai.getExecutable(launcher);
         if (exe==null) {
-            listener.fatalError(Messages.Unity3d_ExecutableNotFound(ai.getName()));
-            return false;
+            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ai.getName()));
         }
 
         if (executeMethod == null || executeMethod.length() == 0) {
-            listener.fatalError(Messages.Unity3d_MissingExecuteMethod());
-            return false;
+            throw new PerformException(Messages.Unity3d_MissingExecuteMethod());
         }
         FilePath moduleRoot = build.getModuleRoot();
         String moduleRootRemote = moduleRoot.getRemote();
         if (!moduleRoot.child("Assets").exists()) {
-            listener.fatalError(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
-            return false;
+            throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
         }
 
         ArgumentListBuilder args = createCommandLineArgs(exe, moduleRootRemote, executeMethod);
 
+        Pipe pipe = Pipe.createRemoteToLocal(launcher);
+
+        PrintStream ca = listener.getLogger();
+        ca.println("Piping unity Editor.log from " + ai.getEditorLogPath(launcher));
+        Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, pipe.getOut());
+        // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
+
+        StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
+        int r;
         try {
-            Pipe pipe = Pipe.createRemoteToLocal(launcher);
-
-            PrintStream ca = listener.getLogger();
-            ca.println("Piping unity Editor.log from " + ai.getEditorLogPath(launcher));
-            Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, pipe.getOut());
-            // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
-
-            StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
-            int r;
+            copierThread.start();
+            r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
+            // r == 11 means executeMethod could not be found ?
+            if (r != 0) {
+                throw new PerformException(Messages.Unity3d_UnityExecFailed(r));
+            }
+        } finally {
+            if (!futureReadBytes.isDone()) {
+                // NOTE According to the API, cancel() should cause future calls to get() to fail with an exception
+                // Jenkins implementation doesn't seem to record it right now and just interrupts the remote task
+                // but we won't use the value, in case that behavior changes, even for debugging / informative purposes
+                // we still call cancel to stop the task.
+                boolean cancel = futureReadBytes.cancel(true);
+                // listener.getLogger().print("Read " + futureReadBytes.get() + " bytes from Editor.log");
+            }
             try {
-                copierThread.start();
-                r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
-                // r == 11 means executeMethod could not be found ?
-                if (r != 0) {
-                    listener.fatalError(Messages.Unity3d_UnityExecFailed(r));
-                    return false;
-                }
-                return true;
-            } finally {
-                if (!futureReadBytes.isDone()) {
-                    // NOTE According to the API, cancel() should cause future calls to get() to fail with an exception
-                    // Jenkins implementation doesn't seem to record it right now and just interrupts the remote task
-                    // but we won't use the value, in case that behavior changes, even for debugging / informative purposes
-                    // we still call cancel to stop the task.
-                    boolean cancel = futureReadBytes.cancel(true);
-                    // listener.getLogger().print("Read " + futureReadBytes.get() + " bytes from Editor.log");
-                }
-                try {
-                    copierThread.join();
-                    if (copierThread.getFailure() != null) {
-                       ca.println("Failure on remote ");
-                       copierThread.getFailure().printStackTrace(ca);
-                    }
-                }
-                finally {
-                    //ca.forceEol();
+                copierThread.join();
+                if (copierThread.getFailure() != null) {
+                   ca.println("Failure on remote ");
+                   copierThread.getFailure().printStackTrace(ca);
                 }
             }
-        } catch (IOException e) {
-            Util.displayIOException(e, listener);
-            String errorMessage = Messages.Unity3d_ExecFailed();
-            e.printStackTrace(listener.fatalError(errorMessage));
-            return false;
+            finally {
+                //ca.forceEol();
+            }
         }
     }
 
