@@ -164,7 +164,7 @@ public class Unity3dBuilder extends Builder {
      * Gets the Unity3d to invoke,
      * or null to invoke the default one.
      */
-    public Unity3dInstallation getUnity3dInstallation() {
+    private Unity3dInstallation getUnity3dInstallation() {
         for( Unity3dInstallation i : getDescriptor().getInstallations() ) {
             if(unity3dName!=null && unity3dName.equals(i.getName()))
                 return i;
