@@ -78,18 +78,18 @@ public class Unity3dBuilder extends Builder {
     private void _perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
 
-        Unity3dInstallation ai = getUnity3dInstallation();
+        Unity3dInstallation ui = getUnity3dInstallation();
 
-        if(ai==null) {
+        if(ui==null) {
             throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
         }
 
-        ai = ai.forNode(Computer.currentComputer().getNode(), listener);
-        ai = ai.forEnvironment(env);
+        ui = ui.forNode(Computer.currentComputer().getNode(), listener);
+        ui = ui.forEnvironment(env);
 
-        String exe = ai.getExecutable(launcher);
+        String exe = ui.getExecutable(launcher);
         if (exe==null) {
-            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ai.getName()));
+            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
         }
 
         if (executeMethod == null || executeMethod.length() == 0) {
@@ -106,8 +106,8 @@ public class Unity3dBuilder extends Builder {
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
         PrintStream ca = listener.getLogger();
-        ca.println("Piping unity Editor.log from " + ai.getEditorLogPath(launcher));
-        Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, pipe.getOut());
+        ca.println("Piping unity Editor.log from " + ui.getEditorLogPath(launcher));
+        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, pipe.getOut());
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
         StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
