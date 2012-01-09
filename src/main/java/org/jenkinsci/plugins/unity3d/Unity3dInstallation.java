@@ -6,7 +6,6 @@ import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
-import hudson.remoting.Pipe;
 import hudson.slaves.NodeSpecific;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
@@ -19,6 +18,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -83,14 +83,29 @@ public class Unity3dInstallation
      * <p>
      * This future can be {@link Future#cancel(boolean) cancelled} in order for the pipe to be closed properly.
      * @param launcher
-     * @param pipe
+     * @param ros the output stream to write into
      * @return the number of bytes read
      * @throws IOException
      */
-    public Future<Long> pipeEditorLog(final Launcher launcher, final Pipe pipe) throws IOException {
+    public Future<Long> pipeEditorLog(final Launcher launcher, final OutputStream ros) throws IOException {
         return launcher.getChannel().callAsync(new Callable<Long, IOException>() {
             public Long call() throws IOException {
-                return new PipeFileAfterModificationAction(getEditorLogFile().getAbsolutePath(), pipe.getOut(), true).call();
+                return new PipeFileAfterModificationAction(getEditorLogFile().getAbsolutePath(), ros, true).call();
+            }
+        });
+    }
+
+    /**
+     * Returns the Editor.log path on the remote machine
+     * @param launcher
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public String getEditorLogPath(final Launcher launcher) throws IOException, InterruptedException {
+        return launcher.getChannel().call(new Callable<String, IOException>() {
+            public String call() throws IOException {
+                return getEditorLogFile().getAbsolutePath();
             }
         });
     }

@@ -8,6 +8,7 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Computer;
 import hudson.remoting.Pipe;
+import hudson.remoting.RemoteOutputStream;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
@@ -21,11 +22,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import javax.servlet.ServletException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.concurrent.Future;
 
 /**
@@ -92,12 +89,18 @@ public class Unity3dBuilder extends Builder {
         ArgumentListBuilder args = createCommandLineArgs(exe, moduleRootRemote, executeMethod);
         
         try {
-            Pipe pipe = Pipe.createRemoteToLocal();
-            Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, pipe);
-            // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
-            OutputStream ca = listener.getLogger();
+            PipedInputStream is = new PipedInputStream();
+            PipedOutputStream pos = new PipedOutputStream(is);
 
-            Thread copierThread = new StreamCopyThread("Pipe editor.log to ouput thread.", pipe.getIn(), ca);
+            boolean isLocal = launcher instanceof Launcher.LocalLauncher;
+            OutputStream os = isLocal ? pos : new RemoteOutputStream(pos);
+
+            PrintStream ca = listener.getLogger();
+            ca.println("Piping unity Editor.log from " + ai.getEditorLogPath(launcher));
+            Future<Long> futureReadBytes = ai.pipeEditorLog(launcher, os);
+            // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
+
+            StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", is, ca);
             int r;
             try {
                 copierThread.start();
