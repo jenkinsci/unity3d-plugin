@@ -7,7 +7,6 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Computer;
-import hudson.remoting.Pipe;
 import hudson.remoting.RemoteOutputStream;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
