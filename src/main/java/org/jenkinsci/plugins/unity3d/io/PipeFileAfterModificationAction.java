@@ -48,15 +48,9 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
             RandomAccessFile raf = null;
             try {
                 while (true) {
+                    // I once experienced a FileNotFoundException here, let's see if this happens again
                     raf = new RandomAccessFile(path, "r");
-                    raf.seek(pos);
-
-                    byte[] buf = new byte[8192];
-                    int len;
-                    while ((len = raf.read(buf)) > 0)
-                        out.write(buf, 0, len);
-
-                    pos = raf.getFilePointer();
+                    pos = continueCopyingFrom(raf, pos);
                     raf.close();
 
                     synchronized (this) {
@@ -85,6 +79,17 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
             }
         }
         return pos;
+    }
+
+    private long continueCopyingFrom(RandomAccessFile raf, long from) throws IOException {
+        raf.seek(from);
+
+        byte[] buf = new byte[8192];
+        int len;
+        while ((len = raf.read(buf)) > 0)
+            out.write(buf, 0, len);
+
+        return raf.getFilePointer();
     }
 
 }
