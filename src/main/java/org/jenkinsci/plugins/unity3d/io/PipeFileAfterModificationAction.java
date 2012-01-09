@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.unity3d.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.Callable;
@@ -36,7 +37,7 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
     }
 
     /**
-     * Wait until the file has been modified and then copy its contents into the output, looping repeatadly as the file is been modified.
+     * Wait until the file has been modified and then copy its contents into the output, looping repeatedly as the file is been modified.
      * @return the number of bytes copied
      * @throws IOException
      */
@@ -66,6 +67,8 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                         }
                     }
                 }
+            } catch (Throwable t) {
+                t.printStackTrace(new PrintStream(out));
             } finally {
                 if (raf != null) {
                     try {
