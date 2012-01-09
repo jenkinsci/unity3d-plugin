@@ -78,30 +78,9 @@ public class Unity3dBuilder extends Builder {
     private void _perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
 
-        Unity3dInstallation ui = getUnity3dInstallation();
+        Unity3dInstallation ui = getAndConfigureUnity3dInstallation(listener, env);
 
-        if(ui==null) {
-            throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
-        }
-
-        ui = ui.forNode(Computer.currentComputer().getNode(), listener);
-        ui = ui.forEnvironment(env);
-
-        String exe = ui.getExecutable(launcher);
-        if (exe==null) {
-            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
-        }
-
-        if (executeMethod == null || executeMethod.length() == 0) {
-            throw new PerformException(Messages.Unity3d_MissingExecuteMethod());
-        }
-        FilePath moduleRoot = build.getModuleRoot();
-        String moduleRootRemote = moduleRoot.getRemote();
-        if (!moduleRoot.child("Assets").exists()) {
-            throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
-        }
-
-        ArgumentListBuilder args = createCommandLineArgs(exe, moduleRootRemote, executeMethod);
+        ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui);
 
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
@@ -139,6 +118,36 @@ public class Unity3dBuilder extends Builder {
                 //ca.forceEol();
             }
         }
+    }
+
+    private ArgumentListBuilder prepareCommandlineArguments(AbstractBuild build, Launcher launcher, Unity3dInstallation ui) throws IOException, InterruptedException, PerformException {
+        String exe = ui.getExecutable(launcher);
+        if (exe==null) {
+            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
+        }
+
+        if (executeMethod == null || executeMethod.length() == 0) {
+            throw new PerformException(Messages.Unity3d_MissingExecuteMethod());
+        }
+        FilePath moduleRoot = build.getModuleRoot();
+        String moduleRootRemote = moduleRoot.getRemote();
+        if (!moduleRoot.child("Assets").exists()) {
+            throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
+        }
+
+        return createCommandLineArgs(exe, moduleRootRemote, executeMethod);
+    }
+
+    private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
+        Unity3dInstallation ui = getUnity3dInstallation();
+
+        if(ui==null) {
+            throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
+        }
+
+        ui = ui.forNode(Computer.currentComputer().getNode(), listener);
+        ui = ui.forEnvironment(env);
+        return ui;
     }
 
     private ArgumentListBuilder createCommandLineArgs(String exe, String moduleRootRemote, final String executeMethod) {
