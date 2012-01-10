@@ -15,6 +15,7 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractProject;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.util.QuotedStringTokenizer;
 import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -36,17 +37,17 @@ import java.util.concurrent.Future;
  */
 public class Unity3dBuilder extends Builder {
 
-    private final String unity3dName;
-    private final String executeMethod;
+    private String unity3dName;
+    private String argLine;
 
     @DataBoundConstructor
-    public Unity3dBuilder(String unity3dName, String executeMethod) {
+    public Unity3dBuilder(String unity3dName, String argLine) {
         this.unity3dName = unity3dName;
-        this.executeMethod = executeMethod;
+        this.argLine = argLine;
     }
 
-    public String getExecuteMethod() {
-        return executeMethod;
+    public String getArgLine() {
+        return argLine;
     }
 
     public String getUnity3dName() {
@@ -126,16 +127,13 @@ public class Unity3dBuilder extends Builder {
             throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
         }
 
-        if (executeMethod == null || executeMethod.length() == 0) {
-            throw new PerformException(Messages.Unity3d_MissingExecuteMethod());
-        }
         FilePath moduleRoot = build.getModuleRoot();
         String moduleRootRemote = moduleRoot.getRemote();
         if (!moduleRoot.child("Assets").exists()) {
             throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
         }
 
-        return createCommandLineArgs(exe, moduleRootRemote, executeMethod);
+        return createCommandlineArgs(exe);
     }
 
     private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
@@ -150,13 +148,10 @@ public class Unity3dBuilder extends Builder {
         return ui;
     }
 
-    private ArgumentListBuilder createCommandLineArgs(String exe, String moduleRootRemote, final String executeMethod) {
+    ArgumentListBuilder createCommandlineArgs(String exe) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
-        args.add("-projectpath", moduleRootRemote);
-        args.add("-quit");
-        args.add("-batchmode");
-        args.add("-executeMethod", executeMethod);
+        args.add(QuotedStringTokenizer.tokenize(argLine));
         return args;
     }
 
@@ -200,23 +195,19 @@ public class Unity3dBuilder extends Builder {
             save();
         }
 
-        public FormValidation doCheckExecuteMethod(@QueryParameter String value)
+        public FormValidation doCheckArgLine(@QueryParameter String value)
                 throws IOException, ServletException {
             if (value.length() == 0)
-                return FormValidation.error("Please set an executeMethod");
-            if (!value.contains("."))
-                return FormValidation.warning("Isn't the executeMethod of the form ClassName.MethodName ?");
+                return FormValidation.error("Please set some arguments");
             return FormValidation.ok();
         }
-
-        // not checking name, it comes from the drop down list...
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             return true;
         }
 
         public String getDisplayName() {
-            return "Invoke Unity3d";
+            return "Invoke Unity3d Editor";
         }
     }
 }
