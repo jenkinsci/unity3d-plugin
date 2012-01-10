@@ -3,11 +3,16 @@ package org.jenkinsci.plugins.unity3d.io;
 import hudson.Launcher;
 import hudson.remoting.RemoteOutputStream;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.OutputStream;
 
 /**
  * A Pipe that works for distributed and non distributed scenarios.
  * Jenkins's Pipe doesn't work for non distributed scenarios.
+ *
  * @author Jerome Lacoste
  */
 public class Pipe {

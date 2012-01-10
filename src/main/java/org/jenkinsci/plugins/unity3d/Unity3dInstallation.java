@@ -1,6 +1,10 @@
 package org.jenkinsci.plugins.unity3d;
 
-import hudson.*;
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.Functions;
+import hudson.Launcher;
+import hudson.Util;
 import hudson.model.EnvironmentSpecific;
 import hudson.model.Hudson;
 import hudson.model.Node;

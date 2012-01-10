@@ -14,9 +14,11 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 
 /**
- * This test was written to find a solution to the piping issue. The Pipe class in Jenkins 1.446 doesn't work properly with asyncCall if the master and slave are on the same machine.
+ * This test was written to find a solution to the piping issue.
+ * The Pipe class in Jenkins 1.446 doesn't work properly with asyncCall if the master and slave are on the same machine.
  *
- * See ProcTest in Jenkins for similar class
+ * See ProcTest in Jenkins for similar tests.
+ *
  * @author Jerome Lacoste
  */
 public class PipeTest extends HudsonTestCase implements Serializable {

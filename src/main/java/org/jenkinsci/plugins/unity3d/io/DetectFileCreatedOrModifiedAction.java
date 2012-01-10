@@ -18,7 +18,7 @@ public class DetectFileCreatedOrModifiedAction implements Callable<File> {
     private long origLastModified;
     private long origSize;
     private boolean origExists;
-    public final int timeoutBetweenChecks;
+    private final int timeoutBetweenChecks;
 
     public DetectFileCreatedOrModifiedAction(String path) {
         this.path = path;

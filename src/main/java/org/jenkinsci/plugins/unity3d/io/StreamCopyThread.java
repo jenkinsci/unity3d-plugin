@@ -30,7 +30,7 @@ import java.io.OutputStream;
 
 /**
  * {@link Thread} that copies {@link java.io.InputStream} to {@link java.io.OutputStream}.
- *
+ * <p>
  * A variation on the Jenkins StreamCopyThread to handle error handling differently and catch errors for reporting.
  *
  * @author Kohsuke Kawaguchi

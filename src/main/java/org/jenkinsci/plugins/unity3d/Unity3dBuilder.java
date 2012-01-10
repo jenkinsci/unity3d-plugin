@@ -91,10 +91,9 @@ public class Unity3dBuilder extends Builder {
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
         StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
-        int r;
         try {
             copierThread.start();
-            r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
+            int r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
             // r == 11 means executeMethod could not be found ?
             if (r != 0) {
                 throw new PerformException(Messages.Unity3d_UnityExecFailed(r));
@@ -156,7 +155,7 @@ public class Unity3dBuilder extends Builder {
     }
 
     /**
-     * Gets the Unity3d to invoke,
+     * @return the Unity3d to invoke,
      * or null to invoke the default one.
      */
     private Unity3dInstallation getUnity3dInstallation() {

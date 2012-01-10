@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * @author Jerome Lacoste
+ */
 public class PipeFileAfterModificationActionTest {
     private String originalContent = "The original content of the file\n" 
             + "Multiple lines of \n"

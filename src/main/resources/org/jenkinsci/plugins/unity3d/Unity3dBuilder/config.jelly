@@ -6,7 +6,7 @@
       </j:forEach>
     </select>
   </f:entry>
-  <f:entry title="${%command line arguments}" field="argLine">
+  <f:entry title="${%Editor command line arguments}" field="argLine">
     <f:textbox />
   </f:entry>
 </j:jelly>
