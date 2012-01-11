@@ -1,0 +1,321 @@
+Initialize mono
+Mono path[0] = '/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0'
+Mono path[1] = '/Applications/Unity/Unity.app/Contents/Frameworks/Managed'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,defer=y
+IsTimeToCheckForNewEditor: Update time 0 current 1326109464
+LicenseInfo:InitializeProtection
+  open PACE from our own executable
+  opened PACE, get info...
+  checked authorization, authstate=100 r=0
+  ReadDeveloperData
+  ReadTokens
+  Forcing trial flag
+
+ BATCHMODE ARGUMENTS:
+/Applications/Unity/Unity.app/Contents/MacOS/Unity
+-projectpath
+/Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace
+-quit
+-batchmode
+-executeMethod
+MyEditorScript.PerformMacOSXBuild
+Successfully changed project path to: /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace
+/Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace
+GfxDevice: creating device client; threaded=0
+Warning: Could not find any matching devices, thus iterator creation failed.OpenGL:
+    Version:  OpenGL 2.1 [2.1 APPLE-7.14.5]
+    Renderer: Intel HD Graphics 3000 OpenGL Engine
+    Vendor:   Intel Inc.
+    VRAM:     288 MB
+    Extensions: GL_ARB_color_buffer_float GL_ARB_depth_buffer_float GL_ARB_depth_clamp GL_ARB_depth_texture GL_ARB_draw_buffers GL_ARB_draw_elements_base_vertex GL_ARB_draw_instanced GL_ARB_fragment_program GL_ARB_fragment_program_shadow GL_ARB_fragment_shader GL_ARB_framebuffer_object GL_ARB_framebuffer_sRGB GL_ARB_half_float_pixel GL_ARB_half_float_vertex GL_ARB_instanced_arrays GL_ARB_multisample GL_ARB_multitexture GL_ARB_occlusion_query GL_ARB_pixel_buffer_object GL_ARB_point_parameters GL_ARB_point_sprite GL_ARB_provoking_vertex GL_ARB_seamless_cube_map GL_ARB_shader_objects GL_ARB_shader_texture_lod GL_ARB_shading_language_100 GL_ARB_shadow GL_ARB_sync GL_ARB_texture_border_clamp GL_ARB_texture_compression GL_ARB_texture_compression_rgtc GL_ARB_texture_cube_map GL_ARB_texture_env_add GL_ARB_texture_env_combine GL_ARB_texture_env_crossbar GL_ARB_texture_env_dot3 GL_ARB_texture_float GL_ARB_texture_mirrored_repeat GL_ARB_texture_non_power_of_two GL_ARB_texture_rectangle GL_ARB_texture_rg GL_ARB_transpose_matrix GL_ARB_vertex_array_bgra GL_ARB_vertex_blend GL_ARB_vertex_buffer_object GL_ARB_vertex_program GL_ARB_vertex_shader GL_ARB_window_pos GL_EXT_abgr GL_EXT_bgra GL_EXT_blend_color GL_EXT_blend_equation_separate GL_EXT_blend_func_separate GL_EXT_blend_minmax GL_EXT_blend_subtract GL_EXT_clip_volume_hint GL_EXT_draw_buffers2 GL_EXT_draw_range_elements GL_EXT_fog_coord GL_EXT_framebuffer_blit GL_EXT_framebuffer_multisample GL_EXT_framebuffer_object GL_EXT_framebuffer_sRGB GL_EXT_geometry_shader4 GL_EXT_gpu_program_parameters GL_EXT_gpu_shader4 GL_EXT_multi_draw_arrays GL_EXT_packed_depth_stencil GL_EXT_packed_float GL_EXT_provoking_vertex GL_EXT_rescale_normal GL_EXT_secondary_color GL_EXT_separate_specular_color GL_EXT_shadow_funcs GL_EXT_stencil_two_side GL_EXT_stencil_wrap GL_EXT_texture_array GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_s3tc GL_EXT_texture_env_add GL_EXT_texture_filter_anisotropic GL_EXT_texture_integer GL_EXT_texture_lod_bias GL_EXT_texture_rectangle GL_EXT_texture_shared_exponent GL_EXT_texture_sRGB GL_EXT_texture_sRGB_decode GL_EXT_timer_query GL_EXT_transform_feedback GL_EXT_vertex_array_bgra GL_APPLE_aux_depth_stencil GL_APPLE_client_storage GL_APPLE_element_array GL_APPLE_fence GL_APPLE_float_pixels GL_APPLE_flush_buffer_range GL_APPLE_flush_render GL_APPLE_object_purgeable GL_APPLE_packed_pixels GL_APPLE_pixel_buffer GL_APPLE_rgb_422 GL_APPLE_row_bytes GL_APPLE_specular_vector GL_APPLE_texture_range GL_APPLE_transform_hint GL_APPLE_vertex_array_object GL_APPLE_vertex_array_range GL_APPLE_vertex_point_size GL_APPLE_vertex_program_evaluators GL_APPLE_ycbcr_422 GL_ATI_separate_stencil GL_ATI_texture_env_combine3 GL_ATI_texture_float GL_IBM_rasterpos_clip GL_NV_blend_square GL_NV_conditional_render GL_NV_depth_clamp GL_NV_fog_distance GL_NV_light_max_exponent GL_NV_texgen_reflection GL_SGIS_generate_mipmap GL_SGIS_texture_edge_clamp GL_SGIS_texture_lod 
+Loading GUID <-> Path mappings ... 0.014926 seconds.
+Loading Asset Database ...  0.034734 seconds
+AssetDatabase consistency checks ...  0.021346 seconds
+Unloading 23 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading -1 unused Assets to reduce memory usage. Loaded Objects now: 50. Operation took 10.790544 ms.
+System memory in use: 12.2 MB.
+Registering custom dll's ... 0.031727 seconds.
+Begin MonoManager ReloadAssembly
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll (this message is harmless)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll (this message is harmless)
+Non platform assembly: /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Assets/Editor/Ionic.Zip.dll (this message is harmless)
+Loading /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Assets/Editor/Ionic.Zip.dll into Unity Child Domain
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.Core.dll (this message is harmless)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.dll (this message is harmless)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/UnityScript.dll (this message is harmless)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/Mono.Cecil.dll (this message is harmless)
+Mono: successfully reloaded assembly
+- Completed reload, in  0.538 seconds
+- starting compile Library/ScriptAssemblies/Assembly-CSharp.dll, for buildtarget 4
+
+-----Compiler Commandline Arguments:
+Filename: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/bin/mono
+Arguments: '/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity/smcs.exe'  @Temp/UnityTempFile-f78f29e93d1474054a20206e9dd54db3
+MONO_CFG_DIR: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/etc
+MONO_PATH: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity
+index: 83
+Responsefile: Temp/UnityTempFile-f78f29e93d1474054a20206e9dd54db3 Contents: 
+-debug
+-target:library
+-nowarn:0169
+-out:'Temp/Assembly-CSharp.dll'
+-r:'/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll'
+-r:'/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll'
+-define:UNITY_3_5_0
+-define:UNITY_3_5
+-define:UNITY_EDITOR
+-define:ENABLE_PROFILER
+-define:UNITY_STANDALONE_OSX
+-define:ENABLE_GENERICS
+-define:ENABLE_DUCK_TYPING
+-define:ENABLE_TERRAIN
+-define:ENABLE_MOVIES
+-define:ENABLE_WEBCAM
+-define:ENABLE_MICROPHONE
+-define:ENABLE_NETWORK
+-define:ENABLE_CLOTH
+-define:ENABLE_WWW
+-define:ENABLE_SUBSTANCE
+'Assets/Script/Util/MouseUtil.cs'
+
+-----CompilerOutput:-stdout--exitcode: 0--compilationhadfailure: False--outfile: Temp/Assembly-CSharp.dll
+Compilation succeeded - 14 warning(s)
+-----CompilerOutput:-stderr----------
+Assets/Script/Rule/XXXX.cs(50,17): warning CS0162: Unreachable code detected
+Assets/Script/Level/Scenes/MainScript.cs(51,25): warning CS0414: The private field `MainScript.m_TexButtonPlay' is assigned but its value is never used
+-----EndCompilerOutput---------------
+- Finished compile Library/ScriptAssemblies/Assembly-CSharp.dll
+Assets/Script/Rule/XXXX.cs(74,26): warning CS0219: The variable `Board' is assigned but its value is never used
+ 
+(Filename: Assets/Script/Rule/XXXX.cs Line: 74)
+
+Assets/Script/Level/Scenes/MainScript.cs(51,25): warning CS0414: The private field `MainScript.m_TexButtonPlay' is assigned but its value is never used
+ 
+(Filename: Assets/Script/Level/Scenes/MainScript.cs Line: 51)
+
+- starting compile Library/ScriptAssemblies/Assembly-CSharp-Editor.dll, for buildtarget 4
+
+-----Compiler Commandline Arguments:
+Filename: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/bin/mono
+Arguments: '/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/gmcs.exe'  @Temp/UnityTempFile-33fdbc337e95e4290abd6da0cc05cc6a
+MONO_CFG_DIR: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/etc
+MONO_PATH: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0
+index: 81
+Responsefile: Temp/UnityTempFile-33fdbc337e95e4290abd6da0cc05cc6a Contents: 
+-debug
+-target:library
+-nowarn:0169
+-out:'Temp/Assembly-CSharp-Editor.dll'
+-r:'/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll'
+-r:'/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll'
+-r:'Library/ScriptAssemblies/Assembly-CSharp.dll'
+-r:'Assets/Editor/Ionic.Zip.dll'
+-define:UNITY_3_5_0
+-define:UNITY_3_5
+-define:UNITY_EDITOR
+-define:ENABLE_PROFILER
+-define:UNITY_STANDALONE_OSX
+-define:ENABLE_GENERICS
+-define:ENABLE_DUCK_TYPING
+-define:ENABLE_TERRAIN
+-define:ENABLE_MOVIES
+-define:ENABLE_WEBCAM
+-define:ENABLE_MICROPHONE
+-define:ENABLE_NETWORK
+-define:ENABLE_CLOTH
+-define:ENABLE_WWW
+-define:ENABLE_SUBSTANCE
+'Assets/Editor/ChangeTextureImportSettingsUnity3.cs'
+'Assets/Editor/FileSystemUtil.cs'
+'Assets/Editor/MyEditorScript.cs'
+
+-----CompilerOutput:-stdout--exitcode: 0--compilationhadfailure: False--outfile: Temp/Assembly-CSharp-Editor.dll
+Compilation succeeded - 1 warning(s)
+-----CompilerOutput:-stderr----------
+Assets/Editor/MyEditorScript.cs(17,55): warning CS0618: `UnityEditor.BuildTarget.StandaloneOSXUniversal' is obsolete: `Building for PowerPC is no longer supported. Will build an intel standalone instead.'
+-----EndCompilerOutput---------------
+- Finished compile Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+Assets/Editor/MyEditorScript.cs(17,55): warning CS0618: `UnityEditor.BuildTarget.StandaloneOSXUniversal' is obsolete: `Building for PowerPC is no longer supported. Will build an intel standalone instead.'
+ 
+(Filename: Assets/Editor/MyEditorScript.cs Line: 17)
+
+Begin MonoManager ReloadAssembly
+- GetNamesOfAssembliesLoadedInCurrentDomain
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/Mono.Cecil.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/UnityScript.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.Core.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll
+- loading assembly into m_AssemblyReferencingDomain: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/mscorlib.dll
+Non platform assembly: /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Library/ScriptAssemblies/Assembly-CSharp.dll (this message is harmless)
+Loading /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Library/ScriptAssemblies/Assembly-CSharp.dll into Unity Child Domain
+Non platform assembly: /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll (this message is harmless)
+Loading /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll into Unity Child Domain
+Non platform assembly: /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Assets/Editor/Ionic.Zip.dll (this message is harmless)
+Loading /Users/Shared/Jenkins/Home/jobs/game_XXXX-trunk_macosx/workspace/Assets/Editor/Ionic.Zip.dll into Unity Child Domain
+Mono: successfully reloaded assembly
+- Completed reload, in  0.107 seconds
+Validating Project structure ... 0.004543 seconds.
+Refresh, detecting if any assets need to be imported or removed ... 0.005383 seconds (Nothing changed)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.Xml.dll (this message is harmless)
+Unloading 135 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 3 unused Assets to reduce memory usage. Loaded Objects now: 330. Operation took 12.359518 ms.
+System memory in use: 18.7 MB.
+Calling custom build script for MacOS X 16
+UnityEngine.Debug:Internal_Log(Int32, String, Object)
+UnityEngine.Debug:Log(Object)
+MyEditorScript:PerformMacOSXBuild() (at Assets/Editor/MyEditorScript.cs:14)
+ 
+(Filename: Assets/Editor/MyEditorScript.cs Line: 14)
+
+System.String[]
+UnityEngine.Debug:Internal_Log(Int32, String, Object)
+UnityEngine.Debug:Log(Object)
+MyEditorScript:PerformMacOSXBuild() (at Assets/Editor/MyEditorScript.cs:15)
+ 
+(Filename: Assets/Editor/MyEditorScript.cs Line: 15)
+
+DisplayProgressbar: Building Player
+building target 4
+- starting compile Library/ScriptAssemblies/Assembly-CSharp.dll, for buildtarget 4
+
+-----Compiler Commandline Arguments:
+Filename: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/bin/mono
+Arguments: '/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity/smcs.exe'  @Temp/UnityTempFile-03e5e7313e20b4a27a41509d63eee1b5
+MONO_CFG_DIR: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/etc
+MONO_PATH: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity
+index: 83
+Responsefile: Temp/UnityTempFile-03e5e7313e20b4a27a41509d63eee1b5 Contents: 
+-debug
+-target:library
+-nowarn:0169
+-out:'Temp/Assembly-CSharp.dll'
+-r:'/Applications/Unity/Unity.app/Contents/PlaybackEngines/MacStandalonePlayer/Managed/UnityEngine.dll'
+-define:UNITY_3_5_0
+-define:UNITY_3_5
+-define:UNITY_STANDALONE_OSX
+-define:ENABLE_GENERICS
+-define:ENABLE_DUCK_TYPING
+-define:ENABLE_TERRAIN
+-define:ENABLE_MOVIES
+-define:ENABLE_WEBCAM
+-define:ENABLE_MICROPHONE
+-define:ENABLE_NETWORK
+-define:ENABLE_CLOTH
+-define:ENABLE_WWW
+-define:ENABLE_SUBSTANCE
+'Assets/Script/Util/MouseUtil.cs'
+
+-----CompilerOutput:-stdout--exitcode: 0--compilationhadfailure: False--outfile: Temp/Assembly-CSharp.dll
+Compilation succeeded - 14 warning(s)
+-----CompilerOutput:-stderr----------
+Assets/Script/Rule/XXXX.cs(50,17): warning CS0162: Unreachable code detected
+Assets/Script/Level/Scenes/MainScript.cs(51,25): warning CS0414: The private field `MainScript.m_TexButtonPlay' is assigned but its value is never used
+-----EndCompilerOutput---------------
+- Finished compile Library/ScriptAssemblies/Assembly-CSharp.dll
+Assets/Script/Rule/XXXX.cs(74,26): warning CS0219: The variable `Board' is assigned but its value is never used
+ 
+(Filename: Assets/Script/Rule/XXXX.cs Line: 74)
+
+Assets/Script/Level/Scenes/MainScript.cs(51,25): warning CS0414: The private field `MainScript.m_TexButtonPlay' is assigned but its value is never used
+ 
+(Filename: Assets/Script/Level/Scenes/MainScript.cs Line: 51)
+
+Updating ProjectSettings/ProjectSettings.asset - GUID: 00000000000000004000000000000000...
+ done. [Time: 18.123453 ms]
+----- Total AssetImport time: 0.034598s, Asset Import only: 0.024404s, CacheServerIntegrate only: 0.000000s, CacheMove: 0.000000s, CacheDelete: 0.000000s, CacheServer Download: 0.000000s [0 B, nan mb/s], CacheServer Hashing: 0.000000s [0 B, nan mb/s]
+Unloading 25 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 90 unused Assets to reduce memory usage. Loaded Objects now: 474. Operation took 8.712051 ms.
+System memory in use: 44.8 MB.
+Unloading 844 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 935 unused Assets to reduce memory usage. Loaded Objects now: 516. Operation took 58.551212 ms.
+System memory in use: 40.8 MB.
+Unloading 16 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 78 unused Assets to reduce memory usage. Loaded Objects now: 457. Operation took 7.830349 ms.
+System memory in use: 43.9 MB.
+Unloading 30 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 145 unused Assets to reduce memory usage. Loaded Objects now: 579. Operation took 6.993650 ms.
+System memory in use: 51.0 MB.
+Unloading 9 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 141 unused Assets to reduce memory usage. Loaded Objects now: 587. Operation took 4.575486 ms.
+System memory in use: 61.4 MB.
+Unloading 9 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 141 unused Assets to reduce memory usage. Loaded Objects now: 595. Operation took 4.886277 ms.
+System memory in use: 70.7 MB.
+Unloading 9 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 141 unused Assets to reduce memory usage. Loaded Objects now: 603. Operation took 4.851713 ms.
+System memory in use: 78.0 MB.
+Unloading 9 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 141 unused Assets to reduce memory usage. Loaded Objects now: 611. Operation took 4.811499 ms.
+System memory in use: 87.8 MB.
+Unloading 7 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 21 unused Assets to reduce memory usage. Loaded Objects now: 497. Operation took 4.586728 ms.
+System memory in use: 110.6 MB.
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 18 unused Assets to reduce memory usage. Loaded Objects now: 474. Operation took 9.529275 ms.
+System memory in use: 82.8 MB.
+Unloading 6 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 51 unused Assets to reduce memory usage. Loaded Objects now: 521. Operation took 4.245531 ms.
+System memory in use: 92.1 MB.
+
+
+Mono dependencies included in the build
+System.Core.dll
+mscorlib.dll
+Assembly-CSharp.dll
+
+Unloading 784 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 573 unused Assets to reduce memory usage. Loaded Objects now: 583. Operation took 42.766487 ms.
+System memory in use: 114.0 MB.
+
+Textures      34.5 mb	 80.3% 
+Meshes        0.0 kb	 0.0% 
+Animations    0.0 kb	 0.0% 
+Sounds        2.5 mb	 5.7% 
+Shaders       1.6 kb	 0.0% 
+Other Assets  3.0 mb	 6.9% 
+Levels        109.3 kb	 0.2% 
+Scripts       205.0 kb	 0.5% 
+Included DLLs 2.6 mb	 6.1% 
+File headers  110.1 kb	 0.3% 
+Complete size 43.0 mb	 100.0% 
+
+Used Assets, sorted by uncompressed size:
+ 2.7 mb	 6.2% Assets/Resources/Images/fond/FONDrock.jpg
+ 1.0 mb	 2.4% Assets/Graphs/MenuWin/win2.png
+ 682.8 kb	 1.6% Assets/Graphs/Intro/Intro/logo.png
+ 594.2 kb	 1.4% Assets/Scenes/ScMenuChap/Data/i5.png
+ 0.1 kb	 0.0% Assets/Script/Level/Scenes/ScIntro.cs
+Unloading 811 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 610 unused Assets to reduce memory usage. Loaded Objects now: 441. Operation took 56.010029 ms.
+System memory in use: 108.3 MB.
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 0 unused Assets to reduce memory usage. Loaded Objects now: 441. Operation took 1.864994 ms.
+System memory in use: 108.4 MB.
+- starting compile Library/ScriptAssemblies/Assembly-CSharp.dll, for buildtarget 4
+
+*** Completed 'Build.Player.MacStandalonePlayer' in 14 seconds
+
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/I18N.dll (this message is harmless)
+Platform assembly: /Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/I18N.West.dll (this message is harmless)
+Batchmode quit successfully invoked - shutting down!
+Refresh, detecting if any assets need to be imported or removed ... 0.005467 seconds (Nothing changed)
+Cleanup mono
+Exiting batchmode successfully now!
