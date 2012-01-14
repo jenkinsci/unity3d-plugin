@@ -132,7 +132,7 @@ public class Unity3dBuilder extends Builder {
             throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
         }
 
-        return createCommandlineArgs(exe);
+        return createCommandlineArgs(exe, moduleRootRemote);
     }
 
     private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
@@ -147,9 +147,12 @@ public class Unity3dBuilder extends Builder {
         return ui;
     }
 
-    ArgumentListBuilder createCommandlineArgs(String exe) {
+    ArgumentListBuilder createCommandlineArgs(String exe, String moduleRootRemote) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
+        if (!argLine.contains("-projectpath")) {
+           args.add("-projectpath", moduleRootRemote);
+        }
         args.add(QuotedStringTokenizer.tokenize(argLine));
         return args;
     }

@@ -1,8 +1,13 @@
 <div>
     The full command line that comes after the executable. Typically something like:
+    <p>
     <code>-quit -batchmode -executeMethod YourEditorScript.YourBuildMethod [-nographic]</code> or <br/>
     <code>-quit -batchmode -buildWindowsPlayer path/to/your/build.exe</code> or <br/>
     <code>-quit -batchmode -buildOSXPlayer path/to/your/build.app</code> <br/>
-    We make little to no attempt to detect conflicting arguments or arguments not suitable to the platform neither at configuration nor at runtime.
+    <p>
+    Note: we make little to no attempt to detect conflicting arguments or arguments not suitable to the platform neither at configuration nor at runtime.
+    <p>If the specified command line contains no <code>-projectpath</code> argument, the plugin automatically adds one with the proper parameter (the workspace of the project on the target machine).
+    This is to make sure unity builds the proper project. Otherwise unity would reuse the last opened project. You can override it, but this hasn't been thoroughly tested.
+    <p>
     See the official <a href="http://unity3d.com/support/documentation/Manual/Command%20Line%20Arguments.html">Editor command line arguments documentation</a>.
 </div>
