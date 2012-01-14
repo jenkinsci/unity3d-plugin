@@ -37,6 +37,14 @@ Installing
 
 Follow (https://wiki.jenkins-ci.org/display/JENKINS/Plugins)
 
+Configuration
+-------------
+
+On the node you will run Unity, add a Unity3d Installation and configure the installation path.
+Then in the project you will run Unity, as a Unity3d build step, and add follow the inline help to configure it.
+Because unity editor will not run properly if you run multiple builds, it is advised to take guards.
+One simple albeit restrictive solution is to use a single executor on your unity build servers.
+
 Links
 -----
 
