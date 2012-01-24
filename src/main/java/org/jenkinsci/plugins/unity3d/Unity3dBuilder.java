@@ -150,8 +150,8 @@ public class Unity3dBuilder extends Builder {
     ArgumentListBuilder createCommandlineArgs(String exe, String moduleRootRemote) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
-        if (!argLine.contains("-projectpath")) {
-           args.add("-projectpath", moduleRootRemote);
+        if (!argLine.contains("-projectPath")) {
+           args.add("-projectPath", moduleRootRemote);
         }
         args.add(QuotedStringTokenizer.tokenize(argLine));
         return args;

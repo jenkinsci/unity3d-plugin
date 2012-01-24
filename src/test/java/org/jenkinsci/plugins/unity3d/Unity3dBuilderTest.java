@@ -23,28 +23,28 @@ public class Unity3dBuilderTest {
     @Test
     public void typicalExecuteMethodArgumentsAddMissingProjectPath() {
         argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod";
-        expectedArgs = asList(exe, "-projectpath", moduleRootRemote, "-quit", "-batchmode", "-nographics", "-executeMethod", "ExecuteClass.ExecuteMethod");
+        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-quit", "-batchmode", "-nographics", "-executeMethod", "ExecuteClass.ExecuteMethod");
         ensureCreateCommandlineArgs(expectedArgs);
     }
 
     @Test
     public void typicalExecuteMethodArgumentsWithCustomProjectPath() {
-        argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod -projectpath XXXX";
-        expectedArgs = asList(exe, "-quit", "-batchmode", "-nographics", "-executeMethod", "ExecuteClass.ExecuteMethod", "-projectpath", "XXXX");
+        argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod -projectPath XXXX";
+        expectedArgs = asList(exe, "-quit", "-batchmode", "-nographics", "-executeMethod", "ExecuteClass.ExecuteMethod", "-projectPath", "XXXX");
         ensureCreateCommandlineArgs(expectedArgs);
     }
 
     @Test
     public void buildWindowsPlayerAddMissingProjectPath() {
         argLine = "-buildWindowsPlayer \"C:\\Temp\\The Win32.exe\"";
-        expectedArgs = asList(exe, "-projectpath", moduleRootRemote, "-buildWindowsPlayer", "C:\\Temp\\The Win32.exe");
+        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-buildWindowsPlayer", "C:\\Temp\\The Win32.exe");
         ensureCreateCommandlineArgs(expectedArgs);
     }
 
     @Test
     public void buildOSXPlayerAddMissingProjectPath() {
         argLine = "-buildOSXPlayer the\\ dir.app";
-        expectedArgs = asList(exe, "-projectpath", moduleRootRemote, "-buildOSXPlayer", "the dir.app");
+        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-buildOSXPlayer", "the dir.app");
         ensureCreateCommandlineArgs(expectedArgs);
     }
 
