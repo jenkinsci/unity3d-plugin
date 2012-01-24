@@ -7,8 +7,8 @@
         <version>1.399</version>
     </parent>
 
-    <artifactId>unity3d</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <artifactId>unity3d-plugin</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <name>Jenkins Unity3d plugin</name>
@@ -16,9 +16,18 @@
 
 
     <scm>
-        <connection>scm:git:git://github.com/lacostej/unity3d-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:lacostej/unity3d-plugin.git</developerConnection>
+        <connection>scm:git:ssh://github.com/jenkinsci/unity3d-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/unity3d-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/unity3d-plugin</url>
     </scm>
+
+    <developers>
+        <developer>
+            <id>lacostej</id>
+            <name>Jerome Lacoste</name>
+            <email>jerome.lacoste@gmail.com</email>
+        </developer>
+    </developers>
 
     <distributionManagement>
         <repository>
