@@ -48,11 +48,12 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
             RandomAccessFile raf = null;
             try {
                 while (true) {
-                    // I once experienced a FileNotFoundException here, let's see if this happens again
-                    raf = new RandomAccessFile(path, "r");
-                    pos = continueCopyingFrom(raf, pos);
-                    raf.close();
-
+                    if (file.exists()) {
+                        // I once experienced a FileNotFoundException here, let's see if this happens again
+                        raf = new RandomAccessFile(path, "r");
+                        pos = continueCopyingFrom(raf, pos);
+                        raf.close();
+                    }
                     synchronized (this) {
                         try {
                             wait(waitBetweenCopyLoops);

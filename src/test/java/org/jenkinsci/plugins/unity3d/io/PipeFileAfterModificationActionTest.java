@@ -28,6 +28,15 @@ public class PipeFileAfterModificationActionTest {
 
     @Test
     public void simulateEditorLogRewritten() throws Exception {
+        testRewriteFile(0);
+    }
+
+    @Test
+    public void simulateEditorLogSlowlyMoved() throws Exception {
+        testRewriteFile(100);
+    }
+
+    private void testRewriteFile(int timeToWaitAfterRename) throws IOException, InterruptedException {
         // Given
         File fakeEditorLog = File.createTempFile("fake_editor", "log");
         Files.write(originalContent, fakeEditorLog, UTF_8);
@@ -47,11 +56,13 @@ public class PipeFileAfterModificationActionTest {
             }
         });
         t.start();
-        
+
         // simulate Editor.log being rewritten
         Thread.sleep(40);
         File prevEditorLog = File.createTempFile("fake_editor", "log");
         fakeEditorLog.renameTo(prevEditorLog);
+
+        Thread.sleep(timeToWaitAfterRename);
 
         Files.write(newContent, fakeEditorLog, UTF_8);
         Thread.sleep(20);
@@ -64,9 +75,9 @@ public class PipeFileAfterModificationActionTest {
         // give us the time to terminate properly the task
         Thread.sleep(50);
 
+        assertEquals(expectedContent, new String(collectedContent.getBuffer(), UTF_8));
+
         Long read = (long) expectedContent.length();
         assertEquals(read, (Long) nbBytesRead.get());
-
-        assertEquals(expectedContent, new String(collectedContent.getBuffer(), UTF_8));
     }
 }
