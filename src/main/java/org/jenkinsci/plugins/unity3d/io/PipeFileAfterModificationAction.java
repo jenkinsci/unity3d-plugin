@@ -42,7 +42,7 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
      * @throws IOException
      */
     public Long call() throws IOException {
-        File file = new DetectFileCreatedOrModifiedAction(path).call();
+        File file = new DetectFileModifiedAction(path).call();
         long pos = 0;
         if (file != null) {
             RandomAccessFile raf = null;

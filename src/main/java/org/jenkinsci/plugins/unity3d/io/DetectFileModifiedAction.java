@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.concurrent.Callable;
 
 /**
- * A Callable that waits until a file has been created or modified.
+ * A Callable that waits until a file has been created, deleted or modified.
  * <p>
  * The task checks for changes in either the last modified timestamp (precise up to the second) or the file size to detect a change.
  * <p>
@@ -13,14 +13,14 @@ import java.util.concurrent.Callable;
  *
  * @author Jerome Lacoste
  */
-public class DetectFileCreatedOrModifiedAction implements Callable<File> {
+public class DetectFileModifiedAction implements Callable<File> {
     private String path;
     private long origLastModified;
     private long origSize;
     private boolean origExists;
     private final int timeoutBetweenChecks;
 
-    public DetectFileCreatedOrModifiedAction(String path) {
+    public DetectFileModifiedAction(String path) {
         this.path = path;
         File orig = new File(path);
         origExists = orig.exists();
