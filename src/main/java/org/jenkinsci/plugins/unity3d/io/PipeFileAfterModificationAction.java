@@ -63,7 +63,7 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                     }
                 }
             } catch (Throwable t) {
-                t.printStackTrace(new PrintStream(out));
+                forcePrintStacktrace(t);
             } finally {
                 if (raf != null) {
                     try {
@@ -80,6 +80,15 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
             }
         }
         return pos;
+    }
+
+    private void forcePrintStacktrace(Throwable t) {
+        PrintStream printStream = new PrintStream(out);
+        try {
+            t.printStackTrace(printStream);
+        } finally {
+            printStream.close();
+        }
     }
 
     private long continueCopyingFrom(RandomAccessFile raf, long from) throws IOException {
