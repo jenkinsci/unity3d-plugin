@@ -7,12 +7,15 @@ import hudson.remoting.VirtualChannel;
 import hudson.slaves.DumbSlave;
 import hudson.util.StreamCopyThread;
 import hudson.util.StreamTaskListener;
-import org.jvnet.hudson.test.HudsonTestCase;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 
+import org.jvnet.hudson.test.HudsonTestCase;
 /**
  * This test was written to find a solution to the piping issue.
  * The Pipe class in Jenkins 1.446 doesn't work properly with asyncCall if the master and slave are on the same machine.
@@ -39,7 +42,16 @@ public class PipeTest extends HudsonTestCase implements Serializable {
                 new StreamTaskListener(System.out, Charset.defaultCharset())));
     }
 
+    private static boolean isRunningOnWindows() {
+        return System.getProperty("os.name").toLowerCase().startsWith("windows");
+    }
+
     public void testPipingFromRemoteWithRemoteLaunch() throws Exception {
+        // Windows cant delete open log files, so ignore this test because of
+        // java.io.IOException: Unable to delete <templogfile>...
+        if (isRunningOnWindows())
+            return;
+
         doPipingFromRemoteTest(new Launcher.RemoteLauncher(
                 new StreamTaskListener(System.out, Charset.defaultCharset()),
                 createSlaveChannel(), true));
