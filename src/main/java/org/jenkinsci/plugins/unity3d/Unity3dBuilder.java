@@ -128,9 +128,6 @@ public class Unity3dBuilder extends Builder {
 
         FilePath moduleRoot = build.getModuleRoot();
         String moduleRootRemote = moduleRoot.getRemote();
-        if (!moduleRoot.child("Assets").exists()) {
-            throw new PerformException(Messages.Unity3d_MissingAssetsNotAUnity3dProjectDirectory(moduleRootRemote));
-        }
 
         return createCommandlineArgs(exe, moduleRootRemote);
     }
