@@ -6,24 +6,30 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Computer;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
-import hudson.model.AbstractProject;
-import hudson.tasks.Builder;
-import hudson.tasks.BuildStepDescriptor;
 import hudson.util.QuotedStringTokenizer;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.ServletException;
+
 import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
-import javax.servlet.ServletException;
-import java.io.*;
-import java.util.concurrent.Future;
 
 /**
  * Unity3d builder
@@ -129,7 +135,7 @@ public class Unity3dBuilder extends Builder {
         FilePath moduleRoot = build.getModuleRoot();
         String moduleRootRemote = moduleRoot.getRemote();
 
-        return createCommandlineArgs(exe, moduleRootRemote);
+        return createCommandlineArgs(build, exe, moduleRootRemote);
     }
 
     private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
@@ -144,12 +150,27 @@ public class Unity3dBuilder extends Builder {
         return ui;
     }
 
-    ArgumentListBuilder createCommandlineArgs(String exe, String moduleRootRemote) {
+    ArgumentListBuilder createCommandlineArgs(AbstractBuild build, String exe, String moduleRootRemote) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
         if (!argLine.contains("-projectPath")) {
            args.add("-projectPath", moduleRootRemote);
         }
+        
+        if(build != null) {
+	        Map buildVariables = build.getBuildVariables();
+	        
+	        Matcher m = Pattern.compile("\\$(\\w+)").matcher(argLine);
+	        
+	        while(m.find()) {
+				String key = m.group();
+				String value = (String) buildVariables.get(key);
+				if(value != null) {
+					argLine = argLine.replace(key, value);
+				}
+			}
+         }
+        
         args.add(QuotedStringTokenizer.tokenize(argLine));
         return args;
     }
