@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
@@ -61,13 +59,15 @@ public class Unity3dBuilder extends Builder {
     }
     
     private static class PerformException extends Exception {
+        private static final long serialVersionUID = 1L;
+        
         private PerformException(String s) {
             super(s);
         }
     }
     
     @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException {
+    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
         try {
             _perform(build, launcher, listener);
             return true;
@@ -82,12 +82,12 @@ public class Unity3dBuilder extends Builder {
         }
     }
 
-    private void _perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
+    private void _perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
-
+        
         Unity3dInstallation ui = getAndConfigureUnity3dInstallation(listener, env);
 
-        ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui);
+        ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
 
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
@@ -110,7 +110,7 @@ public class Unity3dBuilder extends Builder {
                 // Jenkins implementation doesn't seem to record it right now and just interrupts the remote task
                 // but we won't use the value, in case that behavior changes, even for debugging / informative purposes
                 // we still call cancel to stop the task.
-                boolean cancel = futureReadBytes.cancel(true);
+                futureReadBytes.cancel(true);
                 // listener.getLogger().print("Read " + futureReadBytes.get() + " bytes from Editor.log");
             }
             try {
@@ -126,7 +126,7 @@ public class Unity3dBuilder extends Builder {
         }
     }
 
-    private ArgumentListBuilder prepareCommandlineArguments(AbstractBuild build, Launcher launcher, Unity3dInstallation ui) throws IOException, InterruptedException, PerformException {
+    private ArgumentListBuilder prepareCommandlineArguments(AbstractBuild<?,?> build, Launcher launcher, Unity3dInstallation ui, EnvVars vars) throws IOException, InterruptedException, PerformException {
         String exe = ui.getExecutable(launcher);
         if (exe==null) {
             throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
@@ -134,8 +134,9 @@ public class Unity3dBuilder extends Builder {
 
         FilePath moduleRoot = build.getModuleRoot();
         String moduleRootRemote = moduleRoot.getRemote();
+        Map<String,String> buildParameters = build.getBuildVariables();
 
-        return createCommandlineArgs(build, exe, moduleRootRemote);
+        return createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
     }
 
     private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
@@ -150,26 +151,15 @@ public class Unity3dBuilder extends Builder {
         return ui;
     }
 
-    ArgumentListBuilder createCommandlineArgs(AbstractBuild build, String exe, String moduleRootRemote) {
+    ArgumentListBuilder createCommandlineArgs(String exe, String moduleRootRemote, EnvVars vars, Map<String,String> buildVariables) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
         if (!argLine.contains("-projectPath")) {
            args.add("-projectPath", moduleRootRemote);
         }
         
-        if(build != null) {
-	        Map buildVariables = build.getBuildVariables();
-	        
-	        Matcher m = Pattern.compile("\\$(\\w+)").matcher(argLine);
-	        
-	        while(m.find()) {
-				String key = m.group();
-				String value = (String) buildVariables.get(key);
-				if(value != null) {
-					argLine = argLine.replace(key, value);
-				}
-			}
-         }
+        argLine = Util.replaceMacro(argLine, buildVariables);
+        argLine = Util.replaceMacro(argLine, vars);
         
         args.add(QuotedStringTokenizer.tokenize(argLine));
         return args;
@@ -222,7 +212,9 @@ public class Unity3dBuilder extends Builder {
             return FormValidation.ok();
         }
 
-        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+        @SuppressWarnings("rawtypes")
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;
         }
 

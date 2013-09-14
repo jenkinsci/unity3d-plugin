@@ -2,3 +2,6 @@
 target
 *.iml
 work
+.project
+.classpath
+.settings/org.eclipse.jdt.core.prefs
