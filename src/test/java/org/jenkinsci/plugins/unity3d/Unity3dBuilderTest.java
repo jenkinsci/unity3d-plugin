@@ -1,12 +1,15 @@
 package org.jenkinsci.plugins.unity3d;
 
-import hudson.util.ArgumentListBuilder;
-import org.junit.Test;
-
-import java.util.List;
-
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import hudson.EnvVars;
+import hudson.util.ArgumentListBuilder;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
 
 /**
  * @author Jerome Lacoste
@@ -50,7 +53,26 @@ public class Unity3dBuilderTest {
 
     private void ensureCreateCommandlineArgs(List<String> expectedArgs1) {
         Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine);
-        ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote);
+        ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, new EnvVars(), new Hashtable<String,String>());
         assertEquals(expectedArgs1, commandlineArgs.toList());
+    }
+    
+    @Test
+    public void environmentAndBuildVariablesParsing() {
+    	EnvVars vars = new EnvVars();
+        vars.put("param1", "value1");
+        vars.put("param2", "value2");
+        
+        String param2overwrittenValue = "overwrittenValue";
+        
+        Map<String,String> buildParameters = new Hashtable<String,String>();
+        buildParameters.put("param2", param2overwrittenValue);
+    	
+        argLine = "-param1 $param1 -param2 $param2 -projectPath XXXX";
+        expectedArgs = asList(exe, "-param1", "value1", "-param2", param2overwrittenValue, "-projectPath", "XXXX");
+       
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine);
+        ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
+        assertEquals(expectedArgs, commandlineArgs.toList());
     }
 }
