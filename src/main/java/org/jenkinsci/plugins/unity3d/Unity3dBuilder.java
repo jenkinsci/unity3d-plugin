@@ -158,10 +158,10 @@ public class Unity3dBuilder extends Builder {
            args.add("-projectPath", moduleRootRemote);
         }
         
-        argLine = Util.replaceMacro(argLine, buildVariables);
-        argLine = Util.replaceMacro(argLine, vars);
+        String finalArgLine = Util.replaceMacro(argLine, buildVariables);
+        finalArgLine = Util.replaceMacro(finalArgLine, vars);
         
-        args.add(QuotedStringTokenizer.tokenize(argLine));
+        args.add(QuotedStringTokenizer.tokenize(finalArgLine));
         return args;
     }
 
