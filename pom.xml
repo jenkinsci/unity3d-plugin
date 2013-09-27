@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>unity3d-plugin</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>hpi</packaging>
 
     <name>Jenkins Unity3d plugin</name>
