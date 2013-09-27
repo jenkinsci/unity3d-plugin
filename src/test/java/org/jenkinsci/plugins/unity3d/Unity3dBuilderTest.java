@@ -74,5 +74,6 @@ public class Unity3dBuilderTest {
         Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine);
         ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
         assertEquals(expectedArgs, commandlineArgs.toList());
+        assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
     }
 }
