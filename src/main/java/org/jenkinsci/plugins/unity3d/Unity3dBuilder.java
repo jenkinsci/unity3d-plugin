@@ -17,6 +17,7 @@ import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
@@ -92,11 +93,17 @@ public class Unity3dBuilder extends Builder {
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
         PrintStream ca = listener.getLogger();
-        ca.println("Piping unity Editor.log from " + ui.getEditorLogPath(launcher));
-        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, pipe.getOut());
+
+        String logFile = parseArgsForLogFile(args.toCommandArray());
+        if(null == logFile) { //use the default Editor.log path
+            logFile = ui.getEditorLogPath(launcher);
+        }
+
+        ca.println("Piping Unity log from " + logFile);
+        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, logFile, pipe.getOut());
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
-        StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
+        StreamCopyThread copierThread = new StreamCopyThread("Pipe log to output thread.", pipe.getIn(), ca);
         try {
             copierThread.start();
             int r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
@@ -163,6 +170,22 @@ public class Unity3dBuilder extends Builder {
         
         args.add(QuotedStringTokenizer.tokenize(finalArgLine));
         return args;
+    }
+
+
+    private String parseArgsForLogFile(String[] args) throws PerformException {
+        for(int i = 0; i < args.length - 1; i++) {
+            if(args[i].equals("-logFile")) {
+                String logPath = args[i+1];
+                //Check the file can be created by Unity
+                File logFileParent = new File(logPath).getParentFile();
+                if (!logFileParent.isDirectory())
+                    throw new PerformException(Messages.Unity3d_NotADirectory(logFileParent.getPath()));
+                else
+                    return logPath;
+            }
+        }
+        return null;
     }
 
     /**
