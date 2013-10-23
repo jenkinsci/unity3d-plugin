@@ -4,12 +4,14 @@ import hudson.CopyOnWrite;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Computer;
+import hudson.remoting.Callable;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
@@ -19,6 +21,7 @@ import hudson.util.QuotedStringTokenizer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -26,6 +29,7 @@ import java.util.concurrent.Future;
 import javax.servlet.ServletException;
 
 import org.jenkinsci.plugins.unity3d.io.Pipe;
+import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -94,13 +98,10 @@ public class Unity3dBuilder extends Builder {
 
         PrintStream ca = listener.getLogger();
 
-        String logFile = parseArgsForLogFile(args.toCommandArray());
-        if(null == logFile) { //use the default Editor.log path
-            logFile = ui.getEditorLogPath(launcher);
-        }
+        String customLogFile = parseArgsForLogFile(args.toCommandArray());
 
-        ca.println("Piping Unity log from " + logFile);
-        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, logFile, pipe.getOut());
+        ca.println("Piping Unity log from " + customLogFile);
+        Future<Long> futureReadBytes = pipeEditorLog(launcher, customLogFile, pipe.getOut());
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
         StreamCopyThread copierThread = new StreamCopyThread("Pipe log to output thread.", pipe.getIn(), ca);
@@ -173,20 +174,52 @@ public class Unity3dBuilder extends Builder {
     }
 
 
-    private String parseArgsForLogFile(String[] args) throws PerformException {
+    private String parseArgsForLogFile(String[] args) {
         for(int i = 0; i < args.length - 1; i++) {
-            if(args[i].equals("-logFile")) {
-                String logPath = args[i+1];
-                //Check the file can be created by Unity
-                File logFileParent = new File(logPath).getParentFile();
-                if (!logFileParent.isDirectory())
-                    throw new PerformException(Messages.Unity3d_NotADirectory(logFileParent.getPath()));
-                else
-                    return logPath;
-            }
+            if(args[i].equals("-logFile"))
+                return args[i+1];
         }
         return null;
     }
+
+    /**
+     * Create a long running task that pipes any Unity3d log file into the specified pipe.
+     * <p>
+     * This future can be {@link Future#cancel(boolean) cancelled} in order for the pipe to be closed properly.
+     * @param launcher
+     * @param log file on the local system to read from
+     * @param ros the output stream to write into
+     * @return the number of bytes read
+     * @throws IOException
+     */
+    private Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFile, final OutputStream ros) throws IOException, InterruptedException {
+        return launcher.getChannel().callAsync(new Callable<Long, Exception>() {
+            public Long call() throws IOException, InterruptedException {
+                String logFile = getEditorLogFilePath(); //default to Unity's default editor.log
+                
+                if(null != customLogFile) { // check custom log file parent exists
+                    FilePath customLogParent = new FilePath(new File(customLogFile).getParentFile());
+                    if (!customLogParent.isDirectory()) {
+                        throw new IOException(Messages.Unity3d_NotADirectory(customLogParent.getRemote()));
+                    }
+                    logFile = customLogFile;
+                }
+                
+                return new PipeFileAfterModificationAction(logFile, ros, true).call();
+            }
+        });
+    }
+
+    private String getEditorLogFilePath() {
+        if (Functions.isWindows()) {
+            File applocaldata = new File(EnvVars.masterEnvVars.get("LOCALAPPDATA"));
+            return new File(applocaldata, "Unity/Editor/Editor.log").getAbsolutePath();
+        } else { // mac assumed
+            File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
+            return new File(userhome, "Library/Logs/Unity/Editor.log").getAbsolutePath();
+        }
+    }
+
 
     /**
      * @return the Unity3d to invoke,
