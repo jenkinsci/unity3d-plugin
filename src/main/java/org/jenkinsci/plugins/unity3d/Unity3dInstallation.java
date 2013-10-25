@@ -22,9 +22,12 @@ import org.kohsuke.stapler.QueryParameter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 
 /**
  * Represents a Unity3d installation (name, home_dir, etc.)
@@ -66,6 +69,39 @@ public class Unity3dInstallation
                 return null;
             }
         });
+    }
+
+    
+    /**
+     * Create a long running task that pipes any Unity3d log file into the specified pipe.
+     * <p>
+     * This future can be {@link Future#cancel(boolean) cancelled} in order for the pipe to be closed properly.
+     * @param launcher
+     * @param log file on the local system to read from
+     * @param ros the output stream to write into
+     * @return the number of bytes read
+     * @throws IOException
+     */
+    public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFilePath, final OutputStream ros) throws IOException, InterruptedException {
+        return launcher.getChannel().callAsync(new Callable<Long, Exception>() {
+            public Long call() throws IOException, InterruptedException {
+                String logFilePath = customLogFilePath;
+                if(null == logFilePath) { //use Unity default if no custom log file provided
+                    logFilePath = getEditorLogFile().getAbsolutePath();
+                }
+                return new PipeFileAfterModificationAction(logFilePath, ros, true).call();
+            }
+        });
+    }
+
+    private File getEditorLogFile() {
+        if (Functions.isWindows()) {
+            File applocaldata = new File(EnvVars.masterEnvVars.get("LOCALAPPDATA"));
+            return new File(applocaldata, "Unity/Editor/Editor.log");
+        } else { // mac assumed
+            File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
+            return new File(userhome, "Library/Logs/Unity/Editor.log");
+        }
     }
 
     private File getExeFile() {
