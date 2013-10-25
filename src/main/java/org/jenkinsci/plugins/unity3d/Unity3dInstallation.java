@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.unity3d;
 
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
@@ -16,7 +17,6 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.FormValidation;
-import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 
 /**
  * Represents a Unity3d installation (name, home_dir, etc.)
@@ -69,47 +71,25 @@ public class Unity3dInstallation
         });
     }
 
-    private File getExeFile() {
-        String unityHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
-        return getExeFile(new File(unityHome));
-    }
-
-    private static File getExeFile(File unityHome) {
-        if (Functions.isWindows()) {
-            return new File(unityHome, "Editor/Unity.exe");
-        } else { // mac assumed
-            return new File(unityHome, "Contents/MacOS/Unity");
-        }
-    }
-
+    
     /**
-     * Create a long running task that pipes the Unity3d editor.log into the specified pipe.
+     * Create a long running task that pipes any Unity3d log file into the specified pipe.
      * <p>
      * This future can be {@link Future#cancel(boolean) cancelled} in order for the pipe to be closed properly.
      * @param launcher
+     * @param log file on the local system to read from
      * @param ros the output stream to write into
      * @return the number of bytes read
      * @throws IOException
      */
-    public Future<Long> pipeEditorLog(final Launcher launcher, final OutputStream ros) throws IOException {
-        return launcher.getChannel().callAsync(new Callable<Long, IOException>() {
-            public Long call() throws IOException {
-                return new PipeFileAfterModificationAction(getEditorLogFile().getAbsolutePath(), ros, true).call();
-            }
-        });
-    }
-
-    /**
-     * Returns the Editor.log path on the remote machine
-     * @param launcher
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public String getEditorLogPath(final Launcher launcher) throws IOException, InterruptedException {
-        return launcher.getChannel().call(new Callable<String, IOException>() {
-            public String call() throws IOException {
-                return getEditorLogFile().getAbsolutePath();
+    public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFilePath, final OutputStream ros) throws IOException, InterruptedException {
+        return launcher.getChannel().callAsync(new Callable<Long, Exception>() {
+            public Long call() throws IOException, InterruptedException {
+                String logFilePath = customLogFilePath;
+                if(null == logFilePath) { //use Unity default if no custom log file provided
+                    logFilePath = getEditorLogFile().getAbsolutePath();
+                }
+                return new PipeFileAfterModificationAction(logFilePath, ros, true).call();
             }
         });
     }
@@ -121,6 +101,19 @@ public class Unity3dInstallation
         } else { // mac assumed
             File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
             return new File(userhome, "Library/Logs/Unity/Editor.log");
+        }
+    }
+
+    private File getExeFile() {
+        String unityHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
+        return getExeFile(new File(unityHome));
+    }
+
+    private static File getExeFile(File unityHome) {
+        if (Functions.isWindows()) {
+            return new File(unityHome, "Editor/Unity.exe");
+        } else { // mac assumed
+            return new File(unityHome, "Contents/MacOS/Unity");
         }
     }
 

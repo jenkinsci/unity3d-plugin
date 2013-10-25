@@ -4,12 +4,14 @@ import hudson.CopyOnWrite;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Computer;
+import hudson.remoting.Callable;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
@@ -17,6 +19,7 @@ import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
@@ -92,11 +95,16 @@ public class Unity3dBuilder extends Builder {
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
         PrintStream ca = listener.getLogger();
-        ca.println("Piping unity Editor.log from " + ui.getEditorLogPath(launcher));
-        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, pipe.getOut());
+
+        String customLog = getCustomLogFilePath(build.getWorkspace(), args);
+        if(customLog != null) {
+            ca.println("Piping a custom Unity log from "+customLog);
+        }
+        
+        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, customLog, pipe.getOut());
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
-        StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);
+        StreamCopyThread copierThread = new StreamCopyThread("Pipe log to output thread.", pipe.getIn(), ca);
         try {
             copierThread.start();
             int r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
@@ -163,6 +171,25 @@ public class Unity3dBuilder extends Builder {
         
         args.add(QuotedStringTokenizer.tokenize(finalArgLine));
         return args;
+    }
+
+    private String getCustomLogFilePath(FilePath remoteWorkspace, ArgumentListBuilder argsBuilder) throws PerformException, IOException, InterruptedException {
+        String[] args = argsBuilder.toCommandArray();
+        //default to Unity's default editor.log
+        for(int i = 0; i < args.length - 1; i++) {
+            if(args[i].equals("-logFile")) {
+                String customLogPath = args[i+1];
+                //check the parent exists on the remote, otherwise Unity won't create the file
+                FilePath customLogFilePath = new FilePath(remoteWorkspace, customLogPath);
+
+                if(!customLogFilePath.getParent().isDirectory())
+                    throw new PerformException(Messages.Unity3d_NoParentDirectory(customLogPath));
+            
+                return customLogFilePath.getRemote();
+            }
+        }
+
+        return null;
     }
 
     /**
