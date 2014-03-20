@@ -41,7 +41,7 @@ public class IntegrationTests extends HudsonTestCase {
 
         String log = FileUtils.readFileToString(build.getLogFile());
 
-        System.out.println(log);
+        //System.out.println(log);
         assertTrue("Found cause for failure in console", log.contains("Exception: Simulated Exception"));
     }
 }
