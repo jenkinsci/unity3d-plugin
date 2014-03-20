@@ -19,6 +19,7 @@ import hudson.util.QuotedStringTokenizer;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -89,11 +90,19 @@ public class Unity3dBuilder extends Builder {
 
         ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
 
+        List<String> a = args.toList();
+        String customLogFile = null;
+        for (int i = 0; i < a.size() - 1; i++) {
+            if (a.get(i).equals("-logFile")) {
+                customLogFile = a.get(i+1);
+            }
+        }
+
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
         PrintStream ca = listener.getLogger();
-        ca.println("Piping unity Editor.log from " + ui.getEditorLogPath(launcher));
-        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, pipe.getOut());
+        ca.println("Piping unity Editor.log from " + ui.getEditorLogPath(launcher, customLogFile));
+        Future<Long> futureReadBytes = ui.pipeEditorLog(launcher, customLogFile, pipe.getOut());
         // Unity3dConsoleAnnotator ca = new Unity3dConsoleAnnotator(listener.getLogger(), build.getCharset());
 
         StreamCopyThread copierThread = new StreamCopyThread("Pipe editor.log to output thread.", pipe.getIn(), ca);

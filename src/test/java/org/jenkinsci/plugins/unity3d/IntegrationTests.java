@@ -47,7 +47,6 @@ public class IntegrationTests extends HudsonTestCase {
 
     @Test
     @LocalData
-    @Ignore("not ready yet. custom logFile not supported")
     public void testEditorExceptionWithCustomLogFile() throws Exception {
         ensureUnityHomeExists();
 
