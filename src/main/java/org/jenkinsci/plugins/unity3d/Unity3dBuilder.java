@@ -105,6 +105,9 @@ public class Unity3dBuilder extends Builder {
                 throw new PerformException(Messages.Unity3d_UnityExecFailed(r));
             }
         } finally {
+            // give a bit of time for the piping to complete. Not really
+            // sure why it's not properly flushed otherwise
+            Thread.sleep(1000);
             if (!futureReadBytes.isDone()) {
                 // NOTE According to the API, cancel() should cause future calls to get() to fail with an exception
                 // Jenkins implementation doesn't seem to record it right now and just interrupts the remote task

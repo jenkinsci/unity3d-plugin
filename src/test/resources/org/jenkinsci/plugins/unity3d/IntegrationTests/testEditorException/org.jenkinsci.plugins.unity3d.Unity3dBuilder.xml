@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<org.jenkinsci.plugins.unity3d.Unity3dBuilder_-DescriptorImpl>
+  <installations>
+    <org.jenkinsci.plugins.unity3d.Unity3dInstallation>
+      <name>Unity 4.3.3f1</name>
+      <home>/Applications/Unity4.3.3f1/Unity.app</home>
+      <properties/>
+    </org.jenkinsci.plugins.unity3d.Unity3dInstallation>
+  </installations>
+</org.jenkinsci.plugins.unity3d.Unity3dBuilder_-DescriptorImpl>
