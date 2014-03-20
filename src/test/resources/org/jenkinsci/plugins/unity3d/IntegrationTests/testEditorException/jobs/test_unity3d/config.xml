@@ -12,9 +12,6 @@
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.tasks.Shell>
-      <command>env</command>
-    </hudson.tasks.Shell>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder>
       <unity3dName>Unity 4.3.3f1</unity3dName>
       <argLine>-quit -batchmode -executeMethod Builder.TestEditorException</argLine>
