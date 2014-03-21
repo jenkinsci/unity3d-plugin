@@ -92,13 +92,7 @@ public class Unity3dBuilder extends Builder {
 
         ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
 
-        String customLogFile = null;
-        List<String> a = args.toList();
-        for (int i = 0; i < a.size() - 1; i++) {
-            if (a.get(i).equals("-logFile")) {
-                customLogFile = a.get(i+1);
-            }
-        }
+        String customLogFile = findLogFileArgument(args);
 
         Pipe pipe = Pipe.createRemoteToLocal(launcher);
 
@@ -138,6 +132,18 @@ public class Unity3dBuilder extends Builder {
                 //ca.forceEol();
             }
         }
+    }
+
+    /** Find the -logFile argument from the built arg line **/
+    private String findLogFileArgument(ArgumentListBuilder args) {
+        String customLogFile = null;
+        List<String> a = args.toList();
+        for (int i = 0; i < a.size() - 1; i++) {
+            if (a.get(i).equals("-logFile")) {
+                customLogFile = a.get(i+1);
+            }
+        }
+        return customLogFile;
     }
 
     private ArgumentListBuilder prepareCommandlineArguments(AbstractBuild<?,?> build, Launcher launcher, Unity3dInstallation ui, EnvVars vars) throws IOException, InterruptedException, PerformException {
