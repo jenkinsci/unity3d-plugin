@@ -50,6 +50,10 @@ public class Unity3dBuilder extends Builder {
     }
 
     public String getArgLine() {
+        return argLine;
+    }
+
+    private String getArgLineOrGlobalArgLine() {
         if (argLine != null && argLine.trim().length() > 0) {
             return argLine;
         } else {
@@ -175,7 +179,7 @@ public class Unity3dBuilder extends Builder {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
 
-        String theArgLine = getArgLine();
+        String theArgLine = getArgLineOrGlobalArgLine();
         if (!theArgLine.contains("-projectPath")) {
            args.add("-projectPath", moduleRootRemote);
         }
