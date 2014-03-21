@@ -5,4 +5,5 @@ work
 .project
 .classpath
 .settings/org.eclipse.jdt.core.prefs
-src/test/resources/org/jenkinsci/plugins/unity3d/IntegrationTests/testEditorException/jobs/test_unity3d/workspace/Library/
+src/test/resources/**/workspace/Library/
+
