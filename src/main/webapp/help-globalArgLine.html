@@ -1,0 +1,20 @@
+<div>
+    <p>
+    The Unity3d globalArgLine. Allows you to define a per default global configuration for all your unity3d builds.
+    </p>
+    <p>
+    Combined with a plugin like EnvInject, allows you to configure most of your projects in one place.
+    </p>
+    <p>
+    For example: use:
+    </p>
+    <p>
+    <code>-logFile "$WORKSPACE/unity3d_editor.log" -quit -batchmode -executeMethod $UNITY_EXECUTEMETHOD $UNITY_EXTRA_ARGUMENTS</code>
+    </p>
+    <p>
+    and define per project the UNITY_EXECUTEMETHOD and optional UNITY_EXTRA_ARGUMENTS variables.
+    </p>
+
+    <p>
+    Is overriden by the per project <code>argLine</code> value.
+</div>

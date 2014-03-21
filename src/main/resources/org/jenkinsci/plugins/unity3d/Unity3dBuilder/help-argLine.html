@@ -4,10 +4,14 @@
     <code>-quit -batchmode -executeMethod YourEditorScript.YourBuildMethod [-nographics]</code> or <br/>
     <code>-quit -batchmode -buildWindowsPlayer path/to/your/build.exe</code> or <br/>
     <code>-quit -batchmode -buildOSXPlayer path/to/your/build.app</code> <br/>
+
+    <p>If this value isn't set, the globalArgLine is used.
+
     <p>
     Note: we make little to no attempt to detect conflicting arguments or arguments not suitable to the platform neither at configuration nor at runtime.
     <p>If the specified command line contains no <code>-projectpath</code> argument, the plugin automatically adds one with the proper parameter (the workspace of the project on the target machine).
     This is to make sure unity builds the proper project. Otherwise unity would reuse the last opened project. You can override it, but this hasn't been thoroughly tested.
+    <p>If your build agent have multiple executors (which you should probably do), it is highly recommended to make use of a <code>-logFile</code> argument to avoid letting Unityed write to the standard editor.log concurrently. A recommended practise is to use something like <code>-logFile "$WORKSPACE/unity3d_editor.log"</code>.
     <p>
     See the official <a href="http://unity3d.com/support/documentation/Manual/Command%20Line%20Arguments.html">Editor command line arguments documentation</a>.
 </div>

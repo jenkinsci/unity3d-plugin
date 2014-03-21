@@ -14,7 +14,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
-import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
 import java.io.IOException;
@@ -23,12 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import javax.servlet.ServletException;
-
+import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Unity3d builder
@@ -52,13 +50,17 @@ public class Unity3dBuilder extends Builder {
     }
 
     public String getArgLine() {
-        return argLine;
+        if (argLine != null && argLine.trim().length() > 0) {
+            return argLine;
+        } else {
+            return getDescriptor().globalArgLine;
+        }
     }
 
     public String getUnity3dName() {
         return unity3dName;
     }
-    
+
     private static class PerformException extends Exception {
         private static final long serialVersionUID = 1L;
         
@@ -90,8 +92,8 @@ public class Unity3dBuilder extends Builder {
 
         ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
 
-        List<String> a = args.toList();
         String customLogFile = null;
+        List<String> a = args.toList();
         for (int i = 0; i < a.size() - 1; i++) {
             if (a.get(i).equals("-logFile")) {
                 customLogFile = a.get(i+1);
@@ -166,11 +168,13 @@ public class Unity3dBuilder extends Builder {
     ArgumentListBuilder createCommandlineArgs(String exe, String moduleRootRemote, EnvVars vars, Map<String,String> buildVariables) {
         ArgumentListBuilder args = new ArgumentListBuilder();
         args.add(exe);
-        if (!argLine.contains("-projectPath")) {
+
+        String theArgLine = getArgLine();
+        if (!theArgLine.contains("-projectPath")) {
            args.add("-projectPath", moduleRootRemote);
         }
         
-        String finalArgLine = Util.replaceMacro(argLine, buildVariables);
+        String finalArgLine = Util.replaceMacro(theArgLine, buildVariables);
         finalArgLine = Util.replaceMacro(finalArgLine, vars);
         
         args.add(QuotedStringTokenizer.tokenize(finalArgLine));
@@ -197,6 +201,8 @@ public class Unity3dBuilder extends Builder {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+        private String globalArgLine;
+
         @CopyOnWrite
         private volatile Unity3dInstallation[] installations = new Unity3dInstallation[0];
 
@@ -217,11 +223,22 @@ public class Unity3dBuilder extends Builder {
             save();
         }
 
-        public FormValidation doCheckArgLine(@QueryParameter String value)
-                throws IOException, ServletException {
-            if (value.length() == 0)
-                return FormValidation.error("Please set some arguments");
-            return FormValidation.ok();
+        public String getGlobalArgLine() {
+            return globalArgLine;
+        }
+
+        public void setGlobalArgLine(String globalArgLine) {
+            System.out.println("HeLLO: " + globalArgLine);
+            this.globalArgLine = globalArgLine;
+            save();
+        }
+
+        @Override
+        public boolean configure( StaplerRequest req, JSONObject o ) {
+            globalArgLine = Util.fixEmptyAndTrim(o.getString("globalArgLine"));
+            save();
+
+            return true;
         }
 
         @SuppressWarnings("rawtypes")
