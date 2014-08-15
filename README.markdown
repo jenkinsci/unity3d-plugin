@@ -20,6 +20,16 @@ More to come...
 
 The plugin was tested with unity3d 3.4.2 and unity3d 3.5 beta. Tested on distributed and single server environments
 
+Design
+------
+
+The Unity3dBuilder is the point of entry in the plugin. It creates a command that takes the command line parameter from your configuration and passes it to the launcher for execution on the targeted environment. The specified UnityInstallation is used.
+
+For piping of the logFile output, 3 elements are created:
+* a  org.jenkinsci.plugins.unity3d.io.Pipe consisting of a PipedInputStream and a PipedOutputStream. This outputstream is wrapped into a RemoteOutputStream if the launcher is to be executed remotely.
+* a long running Async Callable is passed to the launcher channel. This closure, a PipeFileAfterModificationAction instance, detects that the log file is started being written and copies from it recursively into the pipe until interrupted. It then closes the output
+* a org.jenkinsci.plugins.unity3d.io.StreamCopyThread reads from the pipe and copies it into the job console.
+
 License
 -------
 
