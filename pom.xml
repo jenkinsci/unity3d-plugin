@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>unity3d-plugin</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>hpi</packaging>
 
     <name>Jenkins Unity3d plugin</name>
@@ -18,7 +18,7 @@
         <connection>scm:git:ssh://github.com/jenkinsci/unity3d-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/unity3d-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/unity3d-plugin</url>
-      <tag>HEAD</tag>
+      <tag>unity3d-plugin-0.7</tag>
   </scm>
 
     <developers>
