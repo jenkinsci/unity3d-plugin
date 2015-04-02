@@ -75,11 +75,31 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                     } catch (IOException ignore) {
                     }
                 }
-                if (closeOut)
-                    out.close();
+                closeOutIfNecessary();
             }
+        } else {
+            writeMessagesToOutput("\nWARNING: No change detected to Editor.log path: '" + path + "'.",
+                    "\tThe unity3d plugin was probably unable to find it in its expected locations (see JENKINS-24265).",
+                    "\tConsider using the -logFile argument to force a known editor.log path or report the issue.");
+            closeOutIfNecessary();
         }
         return pos;
+    }
+
+    private void closeOutIfNecessary() throws IOException {
+        if (closeOut)
+            out.close();
+    }
+
+    private void writeMessagesToOutput(String... msgs) {
+        PrintStream printStream = new PrintStream(out);
+        try {
+            for (String msg : msgs) {
+                printStream.println(msg);
+            }
+        } finally {
+            printStream.close();
+        }
     }
 
     private void forcePrintStacktrace(Throwable t) {
