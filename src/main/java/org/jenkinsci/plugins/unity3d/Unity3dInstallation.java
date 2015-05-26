@@ -118,7 +118,11 @@ public class Unity3dInstallation
         if (customLogFile != null) return new File(customLogFile);
 
         if (Functions.isWindows()) {
-            File applocaldata = new File(EnvVars.masterEnvVars.get("LOCALAPPDATA"));
+            String localAppData = EnvVars.masterEnvVars.get("LOCALAPPDATA");
+            if (localAppData == null) {
+                throw new RuntimeException("Empty LOCALAPPDATA environment variable. Use -logFile command line argument as workaround. Unable to find Editor.log location (see JENKINS-24265).");
+            }
+            File applocaldata = new File(localAppData);
             return new File(applocaldata, "Unity/Editor/Editor.log");
         } else { // mac assumed
             File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
