@@ -133,6 +133,9 @@ public class Unity3dInstallation
                 log.fine("Found %LOCALAPPDATA% under " + localAppData);
             } catch (RuntimeException re) {
                 log.warning("Unable to find %LOCALAPPDATA%, reverting to Environment variable " + re.getMessage());
+                // JENKINS-24265 / providing fallback to LOCALAPPDATA shouldn't be necessary, but this worked most
+                // of the cases and I am unable to test for all Windows configurations right now.
+                // This should be removed someday....
                 localAppData = EnvVars.masterEnvVars.get("LOCALAPPDATA");
                 log.fine("Found %LOCALAPPDATA% (from environment variable) under " + localAppData);
                 if (localAppData == null) {
