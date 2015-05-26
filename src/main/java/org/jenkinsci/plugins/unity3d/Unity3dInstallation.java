@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.unity3d;
 
 import hudson.EnvVars;
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
@@ -128,9 +127,17 @@ public class Unity3dInstallation
         if (customLogFile != null) return new File(customLogFile);
 
         if (Functions.isWindows()) {
-            String localAppData = EnvVars.masterEnvVars.get("LOCALAPPDATA");
-            if (localAppData == null) {
-                throw new RuntimeException("Empty LOCALAPPDATA environment variable. Use -logFile command line argument as workaround. Unable to find Editor.log location (see JENKINS-24265).");
+            String localAppData;
+            try {
+                localAppData = Win32Util.getLocalAppData();
+                log.fine("Found %LOCALAPPDATA% under " + localAppData);
+            } catch (RuntimeException re) {
+                log.warning("Unable to find %LOCALAPPDATA%, reverting to Environment variable " + re.getMessage());
+                localAppData = EnvVars.masterEnvVars.get("LOCALAPPDATA");
+                log.fine("Found %LOCALAPPDATA% (from environment variable) under " + localAppData);
+                if (localAppData == null) {
+                    throw new RuntimeException("Empty LOCALAPPDATA environment variable. Use -logFile command line argument as workaround. Unable to find Editor.log location (see JENKINS-24265).");
+                }
             }
             File applocaldata = new File(localAppData);
             return new File(applocaldata, "Unity/Editor/Editor.log");
