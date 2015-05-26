@@ -39,6 +39,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Jerome Lacoste
  */
 public class Unity3dBuilder extends Builder {
+    //private static final Logger log = Logger.getLogger(Unity3dInstallation.class.getName());
 
     private String unity3dName;
     private String argLine;
@@ -151,9 +152,11 @@ public class Unity3dBuilder extends Builder {
     }
 
     private ArgumentListBuilder prepareCommandlineArguments(AbstractBuild<?,?> build, Launcher launcher, Unity3dInstallation ui, EnvVars vars) throws IOException, InterruptedException, PerformException {
-        String exe = ui.getExecutable(launcher);
-        if (exe==null) {
-            throw new PerformException(Messages.Unity3d_ExecutableNotFound(ui.getName()));
+        String exe;
+        try {
+            exe = ui.getExecutable(launcher);
+        } catch (RuntimeException re) {
+            throw new PerformException(re.getMessage());
         }
 
         FilePath moduleRoot = build.getModuleRoot();
@@ -238,7 +241,7 @@ public class Unity3dBuilder extends Builder {
         }
 
         public void setGlobalArgLine(String globalArgLine) {
-            System.out.println("HeLLO: " + globalArgLine);
+            //log.info("setGlobalArgLine: " + globalArgLine);
             this.globalArgLine = globalArgLine;
             save();
         }

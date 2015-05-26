@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.unity3d;
 
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
@@ -26,6 +27,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 /**
  * Represents a Unity3d installation (name, home_dir, etc.)
@@ -36,7 +38,7 @@ public class Unity3dInstallation
         extends ToolInstallation
         implements EnvironmentSpecific<Unity3dInstallation>, NodeSpecific<Unity3dInstallation> {
 
-    // private static final Logger log = LoggerFactory.getLogger(Unity3dInstallation.class);
+    private static final Logger log = Logger.getLogger(Unity3dInstallation.class.getName());
 
     @DataBoundConstructor
     public Unity3dInstallation(final String name, final String home, final List<? extends ToolProperty<?>> properties) {
@@ -61,17 +63,25 @@ public class Unity3dInstallation
     public String getExecutable(Launcher launcher) throws IOException, InterruptedException {
         return launcher.getChannel().call(new Callable<String, IOException>() {
             public String call() throws IOException {
-                File exe = getExeFile();
-                if (exe.exists())
-                    return exe.getPath();
-                return null;
+                return checkUnity3dExecutablePath(getHome());
             }
         });
     }
 
-    private File getExeFile() {
-        String unityHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
-        return getExeFile(new File(unityHome));
+    private static String checkUnity3dExecutablePath(String home) {
+        String unityHome = Util.replaceMacro(home, EnvVars.masterEnvVars);
+        log.fine("UNITY_HOME:" + unityHome);
+        File value = new File(unityHome);
+
+        File unityExe = getExeFile(value);
+
+        String path = unityExe.getAbsolutePath();
+
+        if (!value.isDirectory() || !unityExe.exists()) {
+            throw new RuntimeException(FormValidation.error(Messages.Unity3d_InvalidUnityHomeConfiguration(value, path)).getMessage());
+        }
+
+        return path;
     }
 
     private static File getExeFile(File unityHome) {
@@ -157,22 +167,19 @@ public class Unity3dInstallation
         /**
          * Checks if the UNITY_HOME is valid.
          */
-        public FormValidation doCheckHome(@QueryParameter File value) {
+        public FormValidation doCheckHome(@QueryParameter String value) {
             // this can be used to check the existence of a file on the server, so needs to be protected
             if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
                 return FormValidation.ok();
 
-            if (value.getPath().equals(""))
+            if (value.equals(""))
                 return FormValidation.ok();
 
-            if (!value.isDirectory())
-                return FormValidation.error(Messages.Unity3d_NotADirectory(value));
-
-            File unityExe = getExeFile(value);
-
-            if (!unityExe.exists())
-                return FormValidation.error(Messages.Unity3d_NotUnity3dHomeDirectory(value));
-
+            try {
+                checkUnity3dExecutablePath(value);
+            } catch (RuntimeException re) {
+                return FormValidation.error(re.getMessage());
+            }
             return FormValidation.ok();
         }
 
