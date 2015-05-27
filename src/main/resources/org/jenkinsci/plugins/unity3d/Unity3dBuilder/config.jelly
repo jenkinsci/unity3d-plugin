@@ -9,4 +9,10 @@
   <f:entry title="${%Editor command line arguments}" field="argLine">
     <f:textbox />
   </f:entry>
+  <f:advanced>
+    <f:entry title="${%Unstable return codes}" field="unstableReturnCodes"
+      description="The optional comma separated list of command line return codes that should result in unstable builds instead of failures. E.g '2,3' if you use Unity3d Test Results">
+      <f:textbox/>
+    </f:entry>
+  </f:advanced>
 </j:jelly>

@@ -10,22 +10,33 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Computer;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
+import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -39,19 +50,48 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Jerome Lacoste
  */
 public class Unity3dBuilder extends Builder {
-    //private static final Logger log = Logger.getLogger(Unity3dInstallation.class.getName());
+    private static final Logger log = Logger.getLogger(Unity3dBuilder.class.getName());
 
+    /**
+     * @since 0.1
+     */
     private String unity3dName;
+    /**
+     * @since 0.1
+     */
     private String argLine;
+    private String unstableReturnCodes;
 
     @DataBoundConstructor
-    public Unity3dBuilder(String unity3dName, String argLine) {
+    public Unity3dBuilder(String unity3dName, String argLine, String unstableReturnCodes) {
         this.unity3dName = unity3dName;
         this.argLine = argLine;
+        this.unstableReturnCodes = unstableReturnCodes;
     }
 
+    @SuppressWarnings("unused")
+    private Object readResolve() throws ObjectStreamException {
+        if (unstableReturnCodes == null)
+            unstableReturnCodes = "";
+        return this;
+    }
+
+    /**
+     * @since 0.1
+     */
     public String getArgLine() {
         return argLine;
+    }
+
+    /**
+     * @since 1.0
+     */
+    public String getUnstableReturnCodes() {
+        return unstableReturnCodes;
+    }
+
+    Set<Integer> toUnstableReturnCodesSet() {
+        return toIntegerSet(unstableReturnCodes);
     }
 
     private String getArgLineOrGlobalArgLine() {
@@ -65,6 +105,7 @@ public class Unity3dBuilder extends Builder {
     public String getUnity3dName() {
         return unity3dName;
     }
+
 
     private static class PerformException extends Exception {
         private static final long serialVersionUID = 1L;
@@ -111,9 +152,7 @@ public class Unity3dBuilder extends Builder {
             copierThread.start();
             int r = launcher.launch().cmds(args).envs(env).stdout(ca).pwd(build.getWorkspace()).join();
             // r == 11 means executeMethod could not be found ?
-            if (r != 0) {
-                throw new PerformException(Messages.Unity3d_UnityExecFailed(r));
-            }
+            checkProcResult(build, r);
         } finally {
             // give a bit of time for the piping to complete. Not really
             // sure why it's not properly flushed otherwise
@@ -137,6 +176,26 @@ public class Unity3dBuilder extends Builder {
                 //ca.forceEol();
             }
         }
+    }
+
+    private void checkProcResult(AbstractBuild<?, ?> build, int result) throws PerformException {
+        log.info("Unity command line exited with error code: " + result);
+        if (isBuildUnstable(result)) {
+            log.info(Messages.Unity3d_BuildMarkedAsUnstableBecauseOfStatus(result));
+            build.setResult(Result.UNSTABLE);
+        } else if (!isBuildSuccess(result)) {
+            throw new PerformException(Messages.Unity3d_UnityExecFailed(result));
+        }
+    }
+
+    private boolean isBuildUnstable(int result) {
+        Set<Integer> codes = toUnstableReturnCodesSet();
+        return codes.size() > 0 && codes.contains(result);
+    }
+
+    private boolean isBuildSuccess(int result) {
+        // we could add a set of success results as well, if needed.
+        return result == 0;
     }
 
     /** Find the -logFile argument from the built arg line **/
@@ -206,6 +265,17 @@ public class Unity3dBuilder extends Builder {
         return null;
     }
 
+    static Set<Integer> toIntegerSet(String csvIntegers) {
+        Set<Integer> result = new HashSet<Integer>();
+        if (! csvIntegers.trim().equals("")) {
+            result.addAll(Collections2.transform(Arrays.asList(csvIntegers.split(",")), new Function<String, Integer>() {
+                public Integer apply(String s) {
+                    return Integer.parseInt(s.trim());
+                }
+            }));
+        }
+        return result;
+    }
 
     @Override
     public DescriptorImpl getDescriptor() {
@@ -234,6 +304,15 @@ public class Unity3dBuilder extends Builder {
         public void setInstallations(Unity3dInstallation... antInstallations) {
             this.installations = antInstallations;
             save();
+        }
+
+        public FormValidation doCheckUnstableReturnCodes(@QueryParameter String value) {
+            try {
+                toIntegerSet(value);
+                return FormValidation.ok();
+            } catch (RuntimeException re) {
+                return FormValidation.error(Messages.Unity3d_InvalidParamUnstableReturnCodes(value));
+            }
         }
 
         public String getGlobalArgLine() {
