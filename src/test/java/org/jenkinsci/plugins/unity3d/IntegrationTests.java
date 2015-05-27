@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.unity3d;
 
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -59,5 +60,20 @@ public class IntegrationTests extends HudsonTestCase {
 
         //System.out.println(log);
         assertTrue("Found cause for failure in console", log.contains("Exception: Simulated Exception"));
+    }
+
+    @Test
+    @LocalData
+    public void testExpectADifferentExitCode() throws Exception {
+        ensureUnityHomeExists();
+        FreeStyleProject job = (FreeStyleProject) jenkins.getItem("test_unity3d");
+        assertNotNull(job);
+
+        FreeStyleBuild build = job.scheduleBuild2(0).get();
+
+        String log = FileUtils.readFileToString(build.getLogFile());
+
+        System.out.println(log);
+        assertEquals(Result.UNSTABLE, build.getResult());
     }
 }
