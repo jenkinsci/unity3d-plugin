@@ -80,6 +80,24 @@ public class Unity3dBuilderTest {
     }
 
     @Test
+    public void environmentAndBuildVariablesParsingWithEnvVarsThatReferencesBuildParameters() {
+        EnvVars vars = new EnvVars();
+        vars.put("ARGS", "-projectPath $param");
+
+        Map<String,String> buildParameters = new Hashtable<String,String>();
+        buildParameters.put("param", "XXXX");
+
+        argLine = "-p1 v1 $ARGS";
+        expectedArgs = asList(exe, "-p1", "v1", "-projectPath", "XXXX");
+
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
+        ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
+        assertEquals(expectedArgs, commandlineArgs.toList());
+        assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
+    }
+
+
+    @Test
     public void unstableErrorCodesParsing() throws Exception {
         ensureUnstableReturnCodesParsingWorks(new Integer[]{}, "");
         ensureUnstableReturnCodesParsingWorks(new Integer[]{2, 3}, "2,3");

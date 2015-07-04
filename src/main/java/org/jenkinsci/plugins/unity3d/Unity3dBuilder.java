@@ -242,13 +242,15 @@ public class Unity3dBuilder extends Builder {
         args.add(exe);
 
         String theArgLine = getArgLineOrGlobalArgLine();
-        if (!theArgLine.contains("-projectPath")) {
-           args.add("-projectPath", moduleRootRemote);
-        }
-        
+
         String finalArgLine = Util.replaceMacro(theArgLine, buildVariables);
         finalArgLine = Util.replaceMacro(finalArgLine, vars);
-        
+        finalArgLine = Util.replaceMacro(finalArgLine, buildVariables);
+
+        if (!finalArgLine.contains("-projectPath")) {
+            args.add("-projectPath", moduleRootRemote);
+        }
+
         args.add(QuotedStringTokenizer.tokenize(finalArgLine));
         return args;
     }
