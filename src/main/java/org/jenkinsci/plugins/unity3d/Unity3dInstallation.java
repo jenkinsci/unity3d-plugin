@@ -67,29 +67,55 @@ public class Unity3dInstallation
         });
     }
 
+    static class Unity3dExecutablePath {
+        String home;
+        String path;
+        boolean exists;
+
+        Unity3dExecutablePath(String home, String path, boolean exists) {
+            this.home = home;
+            this.path = path;
+            this.exists = exists;
+        }
+
+        static Unity3dExecutablePath check(String home) {
+            File value = new File(home);
+            File unityExe = getExeFile(value);
+            log.fine("home " + home + " value " + value + " exe " + unityExe + " path abs " + unityExe.getAbsolutePath() + " path " + unityExe.getPath());
+            String path = unityExe.getPath(); // getAbsolutePath
+            boolean exists = value.isDirectory() && unityExe.exists();
+            return new Unity3dExecutablePath(home, path, exists);
+        }
+
+        boolean isVariableExpanded() {
+            return !home.contains("$");
+        }
+
+        private static File getExeFile(File unityHome) {
+            if (Functions.isWindows()) {
+                return new File(unityHome, "Editor/Unity.exe");
+            } else { // mac assumed
+                return new File(unityHome, "Contents/MacOS/Unity");
+            }
+        }
+
+        public String getInvalidInstallMessage() {
+            return Messages.Unity3d_InvalidUnityHomeConfiguration(new File(home), path);
+        }
+
+        public String getParametrizedInstallMessage() {
+            return Messages.Unity3d_UnityHomeNotFullyExpanded(path);
+        }
+    }
+
     private static String checkUnity3dExecutablePath(String home) {
-        String unityHome = Util.replaceMacro(home, EnvVars.masterEnvVars);
-        log.fine("UNITY_HOME:" + unityHome);
-        File value = new File(unityHome);
-
-        File unityExe = getExeFile(value);
-
-        String path = unityExe.getAbsolutePath();
-
-        if (!value.isDirectory() || !unityExe.exists()) {
-            throw new RuntimeException(Messages.Unity3d_InvalidUnityHomeConfiguration(value, path));
+        Unity3dExecutablePath install = Unity3dExecutablePath.check(home);
+        if (!install.exists) {
+            throw new RuntimeException(install.getInvalidInstallMessage());
         }
-
-        return path;
+        return install.path;
     }
 
-    private static File getExeFile(File unityHome) {
-        if (Functions.isWindows()) {
-            return new File(unityHome, "Editor/Unity.exe");
-        } else { // mac assumed
-            return new File(unityHome, "Contents/MacOS/Unity");
-        }
-    }
 
     /**
      * Create a long running task that pipes the Unity3d editor.log into the specified pipe.
@@ -185,10 +211,14 @@ public class Unity3dInstallation
             if (value.equals(""))
                 return FormValidation.ok();
 
-            try {
-                checkUnity3dExecutablePath(value);
-            } catch (RuntimeException re) {
-                return FormValidation.error(re.getMessage());
+            String unityHome = Util.replaceMacro(value, EnvVars.masterEnvVars);
+            log.fine("UNITY_HOME:" + unityHome);
+            Unity3dExecutablePath install = Unity3dExecutablePath.check(unityHome);
+
+            if (! install.isVariableExpanded()) {
+                return FormValidation.ok(install.getParametrizedInstallMessage());
+            } else if (!install.exists) {
+                return FormValidation.error(install.getInvalidInstallMessage());
             }
             return FormValidation.ok();
         }
