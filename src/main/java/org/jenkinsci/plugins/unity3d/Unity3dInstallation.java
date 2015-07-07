@@ -77,7 +77,7 @@ public class Unity3dInstallation
         String path = unityExe.getAbsolutePath();
 
         if (!value.isDirectory() || !unityExe.exists()) {
-            throw new RuntimeException(FormValidation.error(Messages.Unity3d_InvalidUnityHomeConfiguration(value, path)).getMessage());
+            throw new RuntimeException(Messages.Unity3d_InvalidUnityHomeConfiguration(value, path));
         }
 
         return path;
