@@ -94,8 +94,10 @@ public class Unity3dInstallation
         private static File getExeFile(File unityHome) {
             if (Functions.isWindows()) {
                 return new File(unityHome, "Editor/Unity.exe");
-            } else { // mac assumed
+            } else if (Functions2.isMac()) {
                 return new File(unityHome, "Contents/MacOS/Unity");
+            } else { // Linux assumed
+                return new File(unityHome, "Editor/Unity");
             }
         }
 
@@ -170,9 +172,12 @@ public class Unity3dInstallation
             }
             File applocaldata = new File(localAppData);
             return new File(applocaldata, "Unity/Editor/Editor.log");
-        } else { // mac assumed
+        } else if (Functions2.isMac()) {
             File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
             return new File(userhome, "Library/Logs/Unity/Editor.log");
+        } else { // Linux assumed
+            File userhome = new File(EnvVars.masterEnvVars.get("HOME"));
+            return new File(userhome, ".config/unity3d/Editor.log");
         }
     }
 
