@@ -54,7 +54,7 @@ public class Unity3dBuilderTest {
     }
 
     private void ensureCreateCommandlineArgs(List<String> expectedArgs1) {
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", "", argLine, "");
         ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, new EnvVars(), new Hashtable<String,String>());
         assertEquals(expectedArgs1, commandlineArgs.toList());
     }
@@ -73,7 +73,7 @@ public class Unity3dBuilderTest {
         argLine = "-param1 $param1 -param2 $param2 -projectPath XXXX";
         expectedArgs = asList(exe, "-param1", "value1", "-param2", param2overwrittenValue, "-projectPath", "XXXX");
        
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", "", argLine, "");
         ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
         assertEquals(expectedArgs, commandlineArgs.toList());
         assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
@@ -90,7 +90,7 @@ public class Unity3dBuilderTest {
         argLine = "-p1 v1 $ARGS";
         expectedArgs = asList(exe, "-p1", "v1", "-projectPath", "XXXX");
 
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", "", argLine, "");
         ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
         assertEquals(expectedArgs, commandlineArgs.toList());
         assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
@@ -108,11 +108,11 @@ public class Unity3dBuilderTest {
     }
 
     private void ensureUnstableReturnCodesParsingWorks(Integer[] expectedResultCodes, String unstableReturnCodes) throws Exception {
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, unstableReturnCodes);
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", "", argLine, unstableReturnCodes);
         assertEquals(new HashSet<Integer>(asList(expectedResultCodes)), builder.toUnstableReturnCodesSet());
     }
     private void ensureUnstableReturnCodesParsingFails(String unstableReturnCodes) {
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, unstableReturnCodes);
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", "", argLine, unstableReturnCodes);
         try {
             builder.toUnstableReturnCodesSet();
             Assert.fail("Expected failure");
