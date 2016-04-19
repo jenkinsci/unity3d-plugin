@@ -6,6 +6,9 @@
       </j:forEach>
     </select>
   </f:entry>
+  <f:entry title="${%Scriptable Unity3d installation name}" field="scriptableUnity3dName">
+    <f:textbox />
+  </f:entry>
   <f:entry title="${%Editor command line arguments}" field="argLine">
     <f:textbox />
   </f:entry>
