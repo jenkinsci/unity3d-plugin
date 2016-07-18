@@ -1,7 +1,7 @@
 package org.jenkinsci.plugins.unity3d.io;
 
 import hudson.Launcher;
-import hudson.remoting.Callable;
+import jenkins.security.MasterToSlaveCallable;
 import hudson.remoting.Future;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.DumbSlave;
@@ -70,7 +70,7 @@ public class PipeTest extends HudsonTestCase implements Serializable {
 
     }
 
-    private static class PipingCallable implements Callable<String, Throwable>, Serializable {
+    private static class PipingCallable extends MasterToSlaveCallable<String, Throwable> implements Serializable {
         private final OutputStream out;
 
         public PipingCallable(OutputStream out) {

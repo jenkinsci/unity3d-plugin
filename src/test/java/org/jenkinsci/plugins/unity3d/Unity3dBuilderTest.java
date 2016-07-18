@@ -78,6 +78,20 @@ public class Unity3dBuilderTest {
         assertEquals(expectedArgs, commandlineArgs.toList());
         assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
     }
+    
+    @Test
+    public void nullBuildVariables() {
+        EnvVars vars = new EnvVars();
+
+        argLine = "-quit -batchmode -ExecuteMethod foo";
+        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-quit", "-batchmode", "-ExecuteMethod", "foo");
+
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
+        ArgumentListBuilder commandlineArgs = builder.createCommandlineArgs(exe, moduleRootRemote, vars, null);
+
+        assertEquals(expectedArgs, commandlineArgs.toList());
+        assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
+    }
 
     @Test
     public void environmentAndBuildVariablesParsingWithEnvVarsThatReferencesBuildParameters() {
@@ -100,11 +114,13 @@ public class Unity3dBuilderTest {
     @Test
     public void unstableErrorCodesParsing() throws Exception {
         ensureUnstableReturnCodesParsingWorks(new Integer[]{}, "");
+        ensureUnstableReturnCodesParsingWorks(new Integer[]{}, null);
         ensureUnstableReturnCodesParsingWorks(new Integer[]{2, 3}, "2,3");
         ensureUnstableReturnCodesParsingWorks(new Integer[]{-1}, "-1");
         ensureUnstableReturnCodesParsingWorks(new Integer[]{2, 3}, "2, 3");
         ensureUnstableReturnCodesParsingWorks(new Integer[]{2, 3}, " 2 ,3 ");
         ensureUnstableReturnCodesParsingFails(" 2 , ,,");
+        ensureUnstableReturnCodesParsingFails("2.3");
     }
 
     private void ensureUnstableReturnCodesParsingWorks(Integer[] expectedResultCodes, String unstableReturnCodes) throws Exception {
