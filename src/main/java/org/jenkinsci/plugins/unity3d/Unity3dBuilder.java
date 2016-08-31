@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.unity3d;
 
+import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -20,18 +21,14 @@ import hudson.util.QuotedStringTokenizer;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.tasks.BuildStepMonitor;
 import jenkins.tasks.SimpleBuildStep;
 
 import net.sf.json.JSONObject;
@@ -125,15 +122,21 @@ public class Unity3dBuilder extends Builder implements SimpleBuildStep {
             super(s);
         }
     }
-    
+
+    @Override
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.NONE;
+    }
+
     @Override // SimpleBuildStep.perform
-    public void perform(Run<?, ?> run, FilePath fp, Launcher lnchr, TaskListener tl) throws InterruptedException {
+    public void perform(Run<?, ?> run, FilePath fp, Launcher lnchr, TaskListener tl) throws InterruptedException, AbortException {
         try
         {
             _perform(run, fp, lnchr, tl);
         }
         catch (PerformException e) {
             tl.fatalError(e.getMessage());
+            throw new AbortException(e.getMessage());
         } catch (IOException e) {
             Util.displayIOException(e, tl);
             String errorMessage = Messages.Unity3d_ExecUnexpectedlyFailed();
