@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.unity3d.io;
 
 import hudson.Launcher;
-import hudson.remoting.Callable;
 import hudson.remoting.Future;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.DumbSlave;
@@ -15,6 +14,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 
+import jenkins.security.MasterToSlaveCallable;
 import org.jvnet.hudson.test.HudsonTestCase;
 /**
  * This test was written to find a solution to the piping issue.
@@ -70,7 +70,7 @@ public class PipeTest extends HudsonTestCase implements Serializable {
 
     }
 
-    private static class PipingCallable implements Callable<String, Throwable>, Serializable {
+    private static class PipingCallable extends MasterToSlaveCallable<String, Throwable> {
         private final OutputStream out;
 
         public PipingCallable(OutputStream out) {

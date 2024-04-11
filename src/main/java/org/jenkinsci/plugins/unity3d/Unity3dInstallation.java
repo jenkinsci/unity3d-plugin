@@ -9,13 +9,13 @@ import hudson.model.EnvironmentSpecific;
 import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.TaskListener;
-import hudson.remoting.Callable;
 import hudson.slaves.NodeSpecific;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.FormValidation;
+import jenkins.security.MasterToSlaveCallable;
 import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -60,7 +60,7 @@ public class Unity3dInstallation
      * Gets the executable path of this Unity3dBuilder on the given target system.
      */
     public String getExecutable(Launcher launcher) throws IOException, InterruptedException {
-        return launcher.getChannel().call(new Callable<String, IOException>() {
+        return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
                 return checkUnity3dExecutablePath(getHome());
             }
@@ -129,7 +129,7 @@ public class Unity3dInstallation
      * @throws IOException
      */
     public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFile, final OutputStream ros) throws IOException {
-        return launcher.getChannel().callAsync(new Callable<Long, IOException>() {
+        return launcher.getChannel().callAsync(new MasterToSlaveCallable<Long, IOException>() {
             public Long call() throws IOException {
                 return new PipeFileAfterModificationAction(getEditorLogFile(customLogFile).getAbsolutePath(), ros, true).call();
             }
@@ -144,7 +144,7 @@ public class Unity3dInstallation
      * @throws InterruptedException
      */
     public String getEditorLogPath(final Launcher launcher, final String customLogFile) throws IOException, InterruptedException {
-        return launcher.getChannel().call(new Callable<String, IOException>() {
+        return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
                 return getEditorLogFile(customLogFile).getAbsolutePath();
             }
