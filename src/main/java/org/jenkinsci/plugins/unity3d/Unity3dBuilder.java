@@ -62,9 +62,12 @@ public class Unity3dBuilder extends Builder {
     private String argLine;
     private String unstableReturnCodes;
 
+    private String scriptableUnity3dName;
+
     @DataBoundConstructor
-    public Unity3dBuilder(String unity3dName, String argLine, String unstableReturnCodes) {
+    public Unity3dBuilder(String unity3dName, String scriptableUnity3dName, String argLine, String unstableReturnCodes) {
         this.unity3dName = unity3dName;
+        this.scriptableUnity3dName = scriptableUnity3dName;
         this.argLine = argLine;
         this.unstableReturnCodes = unstableReturnCodes;
     }
@@ -106,6 +109,10 @@ public class Unity3dBuilder extends Builder {
         return unity3dName;
     }
 
+    public String getScriptableUnity3dName() {
+        return scriptableUnity3dName;
+    }
+
 
     private static class PerformException extends Exception {
         private static final long serialVersionUID = 1L;
@@ -134,7 +141,7 @@ public class Unity3dBuilder extends Builder {
     private void _perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
         
-        Unity3dInstallation ui = getAndConfigureUnity3dInstallation(listener, env);
+        Unity3dInstallation ui = getAndConfigureUnity3dInstallation(build, listener, env);
 
         ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
 
@@ -225,8 +232,9 @@ public class Unity3dBuilder extends Builder {
         return createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
     }
 
-    private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
-        Unity3dInstallation ui = getUnity3dInstallation();
+    private Unity3dInstallation getAndConfigureUnity3dInstallation(AbstractBuild<?,?> build, BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
+        Map<String,String> buildParameters = build.getBuildVariables();
+        Unity3dInstallation ui = getUnity3dInstallation(env, buildParameters);
 
         if(ui==null) {
             throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
@@ -259,9 +267,20 @@ public class Unity3dBuilder extends Builder {
      * @return the Unity3d to invoke,
      * or null to invoke the default one.
      */
-    private Unity3dInstallation getUnity3dInstallation() {
+    private Unity3dInstallation getUnity3dInstallation(EnvVars env, Map<String,String> buildVariables) {
+        String installationToUse;
+        if (scriptableUnity3dName != null && scriptableUnity3dName.length() > 0) {
+            installationToUse = scriptableUnity3dName;
+            installationToUse = Util.replaceMacro(installationToUse, buildVariables);
+            installationToUse = Util.replaceMacro(installationToUse, env);
+            installationToUse = Util.replaceMacro(installationToUse, buildVariables);
+        }
+        else {
+            installationToUse = unity3dName;
+        }
+
         for( Unity3dInstallation i : getDescriptor().getInstallations() ) {
-            if(unity3dName!=null && unity3dName.equals(i.getName()))
+            if(installationToUse!=null && installationToUse.equals(i.getName()))
                 return i;
         }
         return null;
