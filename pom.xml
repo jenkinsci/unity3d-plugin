@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.78</version>
+    <version>4.88</version>
     <relativePath />
   </parent>
 
@@ -15,14 +15,6 @@
   <name>Jenkins Unity3d plugin</name>
   <url>https://plugins.jenkins.io/unity3d-plugin</url>
 
-  <developers>
-    <developer>
-      <id>lacostej</id>
-      <name>Jerome Lacoste</name>
-      <email>jerome.lacoste@gmail.com</email>
-    </developer>
-  </developers>
-
   <scm>
     <connection>scm:git:https://github.com/jenkinsci/unity3d-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/unity3d-plugin.git</developerConnection>
@@ -31,7 +23,9 @@
   </scm>
 
   <properties>
-    <jenkins.version>2.426</jenkins.version>
+    <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+    <jenkins.baseline>2.462</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
@@ -39,8 +33,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.426.x</artifactId>
-        <version>2839.v003b_4d9d24fd</version>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
+        <version>4228.v0a_71308d905b_</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
