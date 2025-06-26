@@ -1,15 +1,14 @@
 package org.jenkinsci.plugins.unity3d.logs;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Stack;
 import org.jenkinsci.plugins.unity3d.logs.block.Block;
 import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
 import org.jenkinsci.plugins.unity3d.logs.block.UnityBlockList;
 import org.jenkinsci.plugins.unity3d.logs.line.Line;
 import org.jenkinsci.plugins.unity3d.logs.line.UnityLineList;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Stack;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +22,9 @@ public class EditorLogParserImpl implements EditorLogParser {
 
     interface LogListener {
         void activityStarted(MatchedBlock block);
+
         void activityFinished(MatchedBlock block);
+
         void logMessage(String line, Line.Type type);
     }
 
@@ -32,21 +33,15 @@ public class EditorLogParserImpl implements EditorLogParser {
     }
 
     EditorLogParserImpl() {
-        for (Block block : UnityBlockList.editorLogBlocks)
-            block.init();
+        for (Block block : UnityBlockList.editorLogBlocks) block.init();
     }
 
-
-    public void logActivityStart(MatchedBlock block)
-    {
-        if (listener != null)
-           listener.activityStarted(block);
+    public void logActivityStart(MatchedBlock block) {
+        if (listener != null) listener.activityStarted(block);
     }
 
-    public void logActivityEnd(MatchedBlock block)
-    {
-        if (listener != null)
-            listener.activityFinished(block);
+    public void logActivityEnd(MatchedBlock block) {
+        if (listener != null) listener.activityFinished(block);
     }
 
     private void logBlockStart(MatchedBlock block) {
@@ -57,7 +52,6 @@ public class EditorLogParserImpl implements EditorLogParser {
     private void logBlockEnd() {
         logActivityEnd(blockStack.pop());
     }
-
 
     public void log(String message) {
         // Check if new message is the end of the current block (if it exists).
@@ -100,7 +94,6 @@ public class EditorLogParserImpl implements EditorLogParser {
         logLine(message);
     }
 
-
     private void logLine(String message) {
         // Now check message
         for (Line line : UnityLineList.lines) {
@@ -115,8 +108,7 @@ public class EditorLogParserImpl implements EditorLogParser {
     }
 
     private void log(String message, Line.Type type) {
-        if (listener != null)
-            listener.logMessage(message, type);
+        if (listener != null) listener.logMessage(message, type);
     }
 
     public void logException(Exception e) {

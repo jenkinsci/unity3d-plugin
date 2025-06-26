@@ -1,24 +1,22 @@
 package org.jenkinsci.plugins.unity3d.io;
 
+import static org.junit.Assert.assertEquals;
+
 import hudson.Launcher;
 import hudson.remoting.Future;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.DumbSlave;
 import hudson.util.StreamCopyThread;
 import hudson.util.StreamTaskListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
-
 import jenkins.security.MasterToSlaveCallable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * This test was written to find a solution to the piping issue.
@@ -36,8 +34,8 @@ public class PipeTest {
     private VirtualChannel createSlaveChannel() throws Exception {
         DumbSlave s = rule.createSlave();
         s.toComputer().connect(false).get();
-        VirtualChannel ch=null;
-        while (ch==null) {
+        VirtualChannel ch = null;
+        while (ch == null) {
             ch = s.toComputer().getChannel();
             Thread.sleep(100);
         }
@@ -46,8 +44,8 @@ public class PipeTest {
 
     @Test
     public void testPipingFromRemoteWithLocalLaunch() throws Exception {
-        doPipingFromRemoteTest(new Launcher.LocalLauncher(
-                new StreamTaskListener(System.out, Charset.defaultCharset())));
+        doPipingFromRemoteTest(
+                new Launcher.LocalLauncher(new StreamTaskListener(System.out, Charset.defaultCharset())));
     }
 
     private static boolean isRunningOnWindows() {
@@ -58,12 +56,10 @@ public class PipeTest {
     public void testPipingFromRemoteWithRemoteLaunch() throws Exception {
         // Windows cant delete open log files, so ignore this test because of
         // java.io.IOException: Unable to delete <templogfile>...
-        if (isRunningOnWindows())
-            return;
+        if (isRunningOnWindows()) return;
 
         doPipingFromRemoteTest(new Launcher.RemoteLauncher(
-                new StreamTaskListener(System.out, Charset.defaultCharset()),
-                createSlaveChannel(), true));
+                new StreamTaskListener(System.out, Charset.defaultCharset()), createSlaveChannel(), true));
     }
 
     private void doPipingFromRemoteTest(Launcher l) throws IOException, InterruptedException, ExecutionException {
@@ -76,7 +72,6 @@ public class PipeTest {
         assertEquals("DONE", piping.get());
         t.join();
         assertEquals("Hello", os.toString());
-
     }
 
     private static class PipingCallable extends MasterToSlaveCallable<String, Throwable> {

@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.unity3d.logs.block;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,6 +14,5 @@ public class UnityBlockList {
             new CompileBlock(),
             new PrepareBlock(),
             new LightmapBlock(),
-            new UpdateBlock()
-    );
+            new UpdateBlock());
 }

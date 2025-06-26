@@ -1,18 +1,17 @@
 package org.jenkinsci.plugins.unity3d;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
+
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
+import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.recipes.LocalData;
-
-import java.io.File;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Jerome Lacoste
@@ -36,7 +35,9 @@ public class IntegrationTests {
     }
 
     private void ensureUnityHomeExists() {
-        Unity3dInstallation[] installations = rule.jenkins.getDescriptorByType(Unity3dInstallation.DescriptorImpl.class).getInstallations();
+        Unity3dInstallation[] installations = rule.jenkins
+                .getDescriptorByType(Unity3dInstallation.DescriptorImpl.class)
+                .getInstallations();
         assertEquals(1, installations.length);
 
         Unity3dInstallation inst = installations[0];

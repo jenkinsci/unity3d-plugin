@@ -1,29 +1,29 @@
 package org.jenkinsci.plugins.unity3d.io;
 
+import static org.junit.Assert.assertEquals;
 
 import hudson.util.ByteArrayOutputStream2;
-import org.junit.Test;
-
 import java.io.File;
-import java.nio.file.Files;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * @author Jerome Lacoste
  */
 public class PipeFileAfterModificationActionTest {
-    private String originalContent = """
+    private String originalContent =
+            """
             The original content of the file
             Multiple lines of\s
             Build information""";
 
-    private String newContent = """
+    private String newContent =
+            """
             The new content of the file
             Multiple lines of\s
             """;
@@ -49,7 +49,8 @@ public class PipeFileAfterModificationActionTest {
 
         ByteArrayOutputStream2 collectedContent = new ByteArrayOutputStream2();
 
-        final PipeFileAfterModificationAction task = new PipeFileAfterModificationAction(fakeEditorLog.getAbsolutePath(), collectedContent, true);
+        final PipeFileAfterModificationAction task =
+                new PipeFileAfterModificationAction(fakeEditorLog.getAbsolutePath(), collectedContent, true);
         final AtomicLong nbBytesRead = new AtomicLong();
         Thread t = new Thread(() -> {
             try {
@@ -74,7 +75,8 @@ public class PipeFileAfterModificationActionTest {
         Thread.sleep(80);
         String expectedContent = newContent + newContent2;
 
-        // simulate remote cancellation. Using the remoting API, we cancel the task and this interrupts the remote thread
+        // simulate remote cancellation. Using the remoting API, we cancel the task and this interrupts the remote
+        // thread
         t.interrupt();
         // give us the time to terminate properly the task
         Thread.sleep(50);
