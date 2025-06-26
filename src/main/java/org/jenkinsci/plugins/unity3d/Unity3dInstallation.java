@@ -1,12 +1,13 @@
 package org.jenkinsci.plugins.unity3d;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.EnvironmentSpecific;
-import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.slaves.NodeSpecific;
@@ -15,6 +16,7 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 import jenkins.security.MasterToSlaveCallable;
 import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -52,13 +54,14 @@ public class Unity3dInstallation
         return new Unity3dInstallation(this, env.expand(getHome()), getProperties().toList());
     }
 
-    public Unity3dInstallation forNode(Node node, TaskListener log) throws IOException, InterruptedException {
+    public Unity3dInstallation forNode(@NonNull Node node, TaskListener log) throws IOException, InterruptedException {
         return new Unity3dInstallation(this, translateFor(node, log), getProperties().toList());
     }
 
     /**
      * Gets the executable path of this Unity3dBuilder on the given target system.
      */
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public String getExecutable(Launcher launcher) throws IOException, InterruptedException {
         return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
@@ -128,6 +131,7 @@ public class Unity3dInstallation
      * @return the number of bytes read
      * @throws IOException
      */
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFile, final OutputStream ros) throws IOException {
         return launcher.getChannel().callAsync(new MasterToSlaveCallable<Long, IOException>() {
             public Long call() throws IOException {
@@ -143,6 +147,7 @@ public class Unity3dInstallation
      * @throws IOException
      * @throws InterruptedException
      */
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public String getEditorLogPath(final Launcher launcher, final String customLogFile) throws IOException, InterruptedException {
         return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
@@ -185,6 +190,7 @@ public class Unity3dInstallation
     public static class DescriptorImpl extends ToolDescriptor<Unity3dInstallation> {
 
         @Override
+        @NonNull
         public String getDisplayName() {
             return "Unity3d";
         }
@@ -192,12 +198,12 @@ public class Unity3dInstallation
         // for compatibility reasons, the persistence is done by Unity3dBuilder.DescriptorImpl
         @Override
         public Unity3dInstallation[] getInstallations() {
-            return Hudson.getInstance().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).getInstallations();
+            return Jenkins.get().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).getInstallations();
         }
 
         @Override
         public void setInstallations(Unity3dInstallation... installations) {
-            Hudson.getInstance().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).setInstallations(installations);
+            Jenkins.get().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).setInstallations(installations);
         }
 
         @Override
@@ -210,10 +216,10 @@ public class Unity3dInstallation
          */
         public FormValidation doCheckHome(@QueryParameter String value) {
             // this can be used to check the existence of a file on the server, so needs to be protected
-            if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
+            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER))
                 return FormValidation.ok();
 
-            if (value.equals(""))
+            if (value.isEmpty())
                 return FormValidation.ok();
 
             String unityHome = Util.replaceMacro(value, EnvVars.masterEnvVars);

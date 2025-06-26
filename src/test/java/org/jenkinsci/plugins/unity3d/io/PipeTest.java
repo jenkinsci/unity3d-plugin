@@ -10,12 +10,16 @@ import hudson.util.StreamTaskListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 
 import jenkins.security.MasterToSlaveCallable;
-import org.jvnet.hudson.test.HudsonTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * This test was written to find a solution to the piping issue.
  * The Pipe class in Jenkins 1.446 doesn't work properly with asyncCall if the master and slave are on the same machine.
@@ -24,10 +28,13 @@ import org.jvnet.hudson.test.HudsonTestCase;
  *
  * @author Jerome Lacoste
  */
-public class PipeTest extends HudsonTestCase implements Serializable {
+public class PipeTest {
+
+    @Rule
+    public JenkinsRule rule = new JenkinsRule();
 
     private VirtualChannel createSlaveChannel() throws Exception {
-        DumbSlave s = createSlave();
+        DumbSlave s = rule.createSlave();
         s.toComputer().connect(false).get();
         VirtualChannel ch=null;
         while (ch==null) {
@@ -37,6 +44,7 @@ public class PipeTest extends HudsonTestCase implements Serializable {
         return ch;
     }
 
+    @Test
     public void testPipingFromRemoteWithLocalLaunch() throws Exception {
         doPipingFromRemoteTest(new Launcher.LocalLauncher(
                 new StreamTaskListener(System.out, Charset.defaultCharset())));
@@ -46,6 +54,7 @@ public class PipeTest extends HudsonTestCase implements Serializable {
         return System.getProperty("os.name").toLowerCase().startsWith("windows");
     }
 
+    @Test
     public void testPipingFromRemoteWithRemoteLaunch() throws Exception {
         // Windows cant delete open log files, so ignore this test because of
         // java.io.IOException: Unable to delete <templogfile>...
@@ -63,7 +72,7 @@ public class PipeTest extends HudsonTestCase implements Serializable {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Thread t = new StreamCopyThread("Test", pipe.getIn(), os);
         t.start();
-        
+
         assertEquals("DONE", piping.get());
         t.join();
         assertEquals("Hello", os.toString());

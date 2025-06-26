@@ -10,7 +10,7 @@ import java.util.List;
  * Time: 16:51
  */
 public class UnityLineList {
-    public static List<Line> lines = Arrays.asList(
+    public static final List<Line> lines = List.of(
 
             // Warnings
             new Line("Script attached to.*?is missing or no valid script is attached.", Line.Type.Warning),

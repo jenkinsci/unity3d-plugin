@@ -30,7 +30,7 @@ public class Win32Util {
 
     }
 
-    private static Map<String, Object> OPTIONS = new HashMap<String, Object>();
+    private static Map<String, Object> OPTIONS = new HashMap<>();
     static {
         OPTIONS.put(Library.OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
         OPTIONS.put(Library.OPTION_FUNCTION_MAPPER,
@@ -42,14 +42,14 @@ public class Win32Util {
     static class HWND extends HANDLE {
     }
 
-    static interface Shell32 extends Library {
-        public static final int MAX_PATH = 260;
-        public static final int CSIDL_LOCAL_APPDATA = 0x001c;
-        public static final int SHGFP_TYPE_CURRENT = 0;
+    interface Shell32 extends Library {
+        int MAX_PATH = 260;
+        int CSIDL_LOCAL_APPDATA = 0x001c;
+        int SHGFP_TYPE_CURRENT = 0;
         //public static final int SHGFP_TYPE_DEFAULT = 1;
-        public static final int S_OK = 0;
+        int S_OK = 0;
 
-        static Shell32 INSTANCE = (Shell32) Native.loadLibrary("shell32",
+        Shell32 INSTANCE = Native.load("shell32",
                 Shell32.class, OPTIONS);
 
         /**
@@ -58,8 +58,8 @@ public class Win32Util {
          * HRESULT SHGetFolderPath( HWND hwndOwner, int nFolder, HANDLE hToken,
          * DWORD dwFlags, LPTSTR pszPath);
          */
-        public int SHGetFolderPath(HWND hwndOwner, int nFolder, HANDLE hToken,
-                                   int dwFlags, char[] pszPath);
+        int SHGetFolderPath(HWND hwndOwner, int nFolder, HANDLE hToken,
+                            int dwFlags, char[] pszPath);
 
     }
 }

@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.unity3d;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.CopyOnWrite;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -21,6 +23,7 @@ import hudson.util.QuotedStringTokenizer;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.PrintStream;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashSet;
@@ -29,7 +32,6 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 
 import net.sf.json.JSONObject;
@@ -37,7 +39,7 @@ import org.jenkinsci.plugins.unity3d.io.Pipe;
 import org.jenkinsci.plugins.unity3d.io.StreamCopyThread;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * Unity3d builder
@@ -95,7 +97,7 @@ public class Unity3dBuilder extends Builder {
     }
 
     private String getArgLineOrGlobalArgLine() {
-        if (argLine != null && argLine.trim().length() > 0) {
+        if (argLine != null && !argLine.trim().isEmpty()) {
             return argLine;
         } else {
             return getDescriptor().globalArgLine;
@@ -108,13 +110,14 @@ public class Unity3dBuilder extends Builder {
 
 
     private static class PerformException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
-        
+
         private PerformException(String s) {
             super(s);
         }
     }
-    
+
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
         try {
@@ -133,7 +136,7 @@ public class Unity3dBuilder extends Builder {
 
     private void _perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, PerformException {
         EnvVars env = build.getEnvironment(listener);
-        
+
         Unity3dInstallation ui = getAndConfigureUnity3dInstallation(listener, env);
 
         ArgumentListBuilder args = prepareCommandlineArguments(build, launcher, ui, env);
@@ -171,8 +174,7 @@ public class Unity3dBuilder extends Builder {
                    ca.println("Failure on remote ");
                    copierThread.getFailure().printStackTrace(ca);
                 }
-            }
-            finally {
+            } finally {
                 //ca.forceEol();
             }
         }
@@ -190,7 +192,7 @@ public class Unity3dBuilder extends Builder {
 
     private boolean isBuildUnstable(int result) {
         Set<Integer> codes = toUnstableReturnCodesSet();
-        return codes.size() > 0 && codes.contains(result);
+        return !codes.isEmpty() && codes.contains(result);
     }
 
     private boolean isBuildSuccess(int result) {
@@ -225,10 +227,11 @@ public class Unity3dBuilder extends Builder {
         return createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Unity3dInstallation getAndConfigureUnity3dInstallation(BuildListener listener, EnvVars env) throws PerformException, IOException, InterruptedException {
         Unity3dInstallation ui = getUnity3dInstallation();
 
-        if(ui==null) {
+        if (ui==null) {
             throw new PerformException(Messages.Unity3d_NoUnity3dInstallation());
         }
 
@@ -268,13 +271,9 @@ public class Unity3dBuilder extends Builder {
     }
 
     static Set<Integer> toIntegerSet(String csvIntegers) {
-        Set<Integer> result = new HashSet<Integer>();
-        if (! csvIntegers.trim().equals("")) {
-            result.addAll(Collections2.transform(Arrays.asList(csvIntegers.split(",")), new Function<String, Integer>() {
-                public Integer apply(String s) {
-                    return Integer.parseInt(s.trim());
-                }
-            }));
+        Set<Integer> result = new HashSet<>();
+        if (!csvIntegers.trim().isEmpty()) {
+            result.addAll(Collections2.transform(Arrays.asList(csvIntegers.split(",")), s -> Integer.parseInt(s.trim())));
         }
         return result;
     }
@@ -328,7 +327,7 @@ public class Unity3dBuilder extends Builder {
         }
 
         @Override
-        public boolean configure( StaplerRequest req, JSONObject o ) {
+        public boolean configure( StaplerRequest2 req, JSONObject o ) {
             globalArgLine = Util.fixEmptyAndTrim(o.getString("globalArgLine"));
             save();
 
@@ -341,6 +340,8 @@ public class Unity3dBuilder extends Builder {
             return true;
         }
 
+        @Override
+        @NonNull
         public String getDisplayName() {
             return "Invoke Unity3d Editor";
         }

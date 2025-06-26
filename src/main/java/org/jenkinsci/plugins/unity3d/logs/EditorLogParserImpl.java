@@ -18,7 +18,7 @@ import java.util.Stack;
  * Time: 16:02
  */
 public class EditorLogParserImpl implements EditorLogParser {
-    private final Stack<MatchedBlock> blockStack = new Stack<MatchedBlock>();
+    private final Stack<MatchedBlock> blockStack = new Stack<>();
     private LogListener listener;
 
     interface LogListener {
@@ -123,6 +123,6 @@ public class EditorLogParserImpl implements EditorLogParser {
         final Writer stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
 
-        log("Exception: " + stackTrace.toString(), Line.Type.Failure);
+        log("Exception: " + stackTrace, Line.Type.Failure);
     }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 /**
@@ -92,22 +93,16 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
     }
 
     private void writeMessagesToOutput(String... msgs) {
-        PrintStream printStream = new PrintStream(out);
-        try {
+        try (PrintStream printStream = new PrintStream(out, false, StandardCharsets.UTF_8)) {
             for (String msg : msgs) {
                 printStream.println(msg);
             }
-        } finally {
-            printStream.close();
         }
     }
 
     private void forcePrintStacktrace(Throwable t) {
-        PrintStream printStream = new PrintStream(out);
-        try {
+        try (PrintStream printStream = new PrintStream(out, false, StandardCharsets.UTF_8)) {
             t.printStackTrace(printStream);
-        } finally {
-            printStream.close();
         }
     }
 

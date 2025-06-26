@@ -23,6 +23,7 @@
  */
 package org.jenkinsci.plugins.unity3d.logs;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.console.LineTransformationOutputStream;
 import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
 import org.jenkinsci.plugins.unity3d.logs.line.Line;
@@ -50,13 +51,14 @@ public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream im
     }
 
     public void activityStarted(MatchedBlock block) {
-        
+
     }
 
     public void activityFinished(MatchedBlock block) {
-        
+
     }
 
+    @SuppressFBWarnings(value = "UC_USELESS_VOID_METHOD", justification = "Legacy code")
     public void logMessage(String line, Line.Type type) {
         switch (type) {
             case Normal:
@@ -79,7 +81,7 @@ public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream im
         line = trimEOL(line);
 
         handle(line);
-        
+
         out.write(b,0,len);
     }
 

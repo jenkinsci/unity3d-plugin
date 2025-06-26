@@ -10,7 +10,7 @@ import java.util.List;
  * Time: 09:52
  */
 public class UnityBlockList {
-    static public List<Block> editorLogBlocks = Arrays.asList(
+    public static final List<Block> editorLogBlocks = List.of(
             new PlayerStatisticsBlock(),
             new CompileBlock(),
             new PrepareBlock(),
