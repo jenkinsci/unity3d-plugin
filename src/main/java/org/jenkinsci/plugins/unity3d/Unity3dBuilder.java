@@ -257,9 +257,10 @@ public class Unity3dBuilder extends Builder {
         finalArgLine = Util.replaceMacro(finalArgLine, vars);
         finalArgLine = Util.replaceMacro(finalArgLine, buildVariables);
 
-        if (!finalArgLine.contains("-projectPath")) {
+        // Unity does take the PWD as project path. Jenkins changes the PWD to the workspace in 2.150.3
+        /*if (!finalArgLine.contains("-projectPath")) {
             args.add("-projectPath", moduleRootRemote);
-        }
+        }*/
 
         args.add(QuotedStringTokenizer.tokenize(finalArgLine));
         return args;
