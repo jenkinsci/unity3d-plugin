@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.unity3d.io;
 
-import static org.junit.Assert.assertEquals;
+import static hudson.Functions.isWindows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import hudson.Launcher;
 import hudson.remoting.Future;
@@ -9,14 +11,13 @@ import hudson.slaves.DumbSlave;
 import hudson.util.StreamCopyThread;
 import hudson.util.StreamTaskListener;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.concurrent.ExecutionException;
 import jenkins.security.MasterToSlaveCallable;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
  * This test was written to find a solution to the piping issue.
@@ -26,13 +27,18 @@ import org.jvnet.hudson.test.JenkinsRule;
  *
  * @author Jerome Lacoste
  */
-public class PipeTest {
+@WithJenkins
+class PipeTest {
 
-    @Rule
-    public JenkinsRule rule = new JenkinsRule();
+    private JenkinsRule r;
+
+    @BeforeEach
+    void beforeEach(JenkinsRule rule) {
+        r = rule;
+    }
 
     private VirtualChannel createSlaveChannel() throws Exception {
-        DumbSlave s = rule.createSlave();
+        DumbSlave s = r.createSlave();
         s.toComputer().connect(false).get();
         VirtualChannel ch = null;
         while (ch == null) {
@@ -43,26 +49,22 @@ public class PipeTest {
     }
 
     @Test
-    public void testPipingFromRemoteWithLocalLaunch() throws Exception {
+    void testPipingFromRemoteWithLocalLaunch() throws Exception {
         doPipingFromRemoteTest(
                 new Launcher.LocalLauncher(new StreamTaskListener(System.out, Charset.defaultCharset())));
     }
 
-    private static boolean isRunningOnWindows() {
-        return System.getProperty("os.name").toLowerCase().startsWith("windows");
-    }
-
     @Test
-    public void testPipingFromRemoteWithRemoteLaunch() throws Exception {
-        // Windows cant delete open log files, so ignore this test because of
-        // java.io.IOException: Unable to delete <templogfile>...
-        if (isRunningOnWindows()) return;
+    void testPipingFromRemoteWithRemoteLaunch() throws Exception {
+        assumeFalse(
+                isWindows(),
+                "Windows cant delete open log files, so ignore this test because of java.io.IOException: Unable to delete <templogfile>");
 
         doPipingFromRemoteTest(new Launcher.RemoteLauncher(
                 new StreamTaskListener(System.out, Charset.defaultCharset()), createSlaveChannel(), true));
     }
 
-    private void doPipingFromRemoteTest(Launcher l) throws IOException, InterruptedException, ExecutionException {
+    private void doPipingFromRemoteTest(Launcher l) throws Exception {
         Pipe pipe = Pipe.createRemoteToLocal(l);
         Future<String> piping = l.getChannel().callAsync(new PipingCallable(pipe.getOut()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();

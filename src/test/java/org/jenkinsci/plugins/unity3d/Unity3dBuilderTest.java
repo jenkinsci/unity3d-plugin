@@ -1,7 +1,8 @@
 package org.jenkinsci.plugins.unity3d;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import hudson.EnvVars;
 import hudson.util.ArgumentListBuilder;
@@ -9,41 +10,36 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jerome Lacoste
  */
-public class Unity3dBuilderTest {
+class Unity3dBuilderTest {
 
-    private String exe = "/Applications/Unity/Unity.app";
-    private String moduleRootRemote = "/Users/Shared/Jenkins/Home/jobs/project1/workspace";
-
-    private String argLine;
-
-    private List<String> expectedArgs;
+    private static final String EXE = "/Applications/Unity/Unity.app";
+    private static final String MODULE_ROOT_REMOTE = "/Users/Shared/Jenkins/Home/jobs/project1/workspace";
 
     @Test
-    public void typicalExecuteMethodArgumentsAddMissingProjectPath() {
-        argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod";
-        expectedArgs = asList(
-                exe,
+    void typicalExecuteMethodArgumentsAddMissingProjectPath() {
+        String argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod";
+        List<String> expectedArgs = asList(
+                EXE,
                 "-projectPath",
-                moduleRootRemote,
+                MODULE_ROOT_REMOTE,
                 "-quit",
                 "-batchmode",
                 "-nographics",
                 "-executeMethod",
                 "ExecuteClass.ExecuteMethod");
-        ensureCreateCommandlineArgs(expectedArgs);
+        ensureCreateCommandlineArgs(argLine, expectedArgs);
     }
 
     @Test
-    public void typicalExecuteMethodArgumentsWithCustomProjectPath() {
-        argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod -projectPath XXXX";
-        expectedArgs = asList(
-                exe,
+    void typicalExecuteMethodArgumentsWithCustomProjectPath() {
+        String argLine = "-quit -batchmode -nographics -executeMethod ExecuteClass.ExecuteMethod -projectPath XXXX";
+        List<String> expectedArgs = asList(
+                EXE,
                 "-quit",
                 "-batchmode",
                 "-nographics",
@@ -51,32 +47,33 @@ public class Unity3dBuilderTest {
                 "ExecuteClass.ExecuteMethod",
                 "-projectPath",
                 "XXXX");
-        ensureCreateCommandlineArgs(expectedArgs);
+        ensureCreateCommandlineArgs(argLine, expectedArgs);
     }
 
     @Test
-    public void buildWindowsPlayerAddMissingProjectPath() {
-        argLine = "-buildWindowsPlayer \"C:\\Temp\\The Win32.exe\"";
-        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-buildWindowsPlayer", "C:\\Temp\\The Win32.exe");
-        ensureCreateCommandlineArgs(expectedArgs);
+    void buildWindowsPlayerAddMissingProjectPath() {
+        String argLine = "-buildWindowsPlayer \"C:\\Temp\\The Win32.exe\"";
+        List<String> expectedArgs =
+                asList(EXE, "-projectPath", MODULE_ROOT_REMOTE, "-buildWindowsPlayer", "C:\\Temp\\The Win32.exe");
+        ensureCreateCommandlineArgs(argLine, expectedArgs);
     }
 
     @Test
-    public void buildOSXPlayerAddMissingProjectPath() {
-        argLine = "-buildOSXPlayer the\\ dir.app";
-        expectedArgs = asList(exe, "-projectPath", moduleRootRemote, "-buildOSXPlayer", "the dir.app");
-        ensureCreateCommandlineArgs(expectedArgs);
+    void buildOSXPlayerAddMissingProjectPath() {
+        String argLine = "-buildOSXPlayer the\\ dir.app";
+        List<String> expectedArgs = asList(EXE, "-projectPath", MODULE_ROOT_REMOTE, "-buildOSXPlayer", "the dir.app");
+        ensureCreateCommandlineArgs(argLine, expectedArgs);
     }
 
-    private void ensureCreateCommandlineArgs(List<String> expectedArgs1) {
+    private void ensureCreateCommandlineArgs(String argLine, List<String> expectedArgs) {
         Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
         ArgumentListBuilder commandlineArgs =
-                builder.createCommandlineArgs(exe, moduleRootRemote, new EnvVars(), new Hashtable<>());
-        assertEquals(expectedArgs1, commandlineArgs.toList());
+                builder.createCommandlineArgs(EXE, MODULE_ROOT_REMOTE, new EnvVars(), new Hashtable<>());
+        assertEquals(expectedArgs, commandlineArgs.toList());
     }
 
     @Test
-    public void environmentAndBuildVariablesParsing() {
+    void environmentAndBuildVariablesParsing() {
         EnvVars vars = new EnvVars();
         vars.put("param1", "value1");
         vars.put("param2", "value2");
@@ -86,36 +83,37 @@ public class Unity3dBuilderTest {
         Map<String, String> buildParameters = new Hashtable<>();
         buildParameters.put("param2", param2overwrittenValue);
 
-        argLine = "-param1 $param1 -param2 $param2 -projectPath XXXX";
-        expectedArgs = asList(exe, "-param1", "value1", "-param2", param2overwrittenValue, "-projectPath", "XXXX");
+        String argLine = "-param1 $param1 -param2 $param2 -projectPath XXXX";
+        List<String> expectedArgs =
+                asList(EXE, "-param1", "value1", "-param2", param2overwrittenValue, "-projectPath", "XXXX");
 
         Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
         ArgumentListBuilder commandlineArgs =
-                builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
+                builder.createCommandlineArgs(EXE, MODULE_ROOT_REMOTE, vars, buildParameters);
         assertEquals(expectedArgs, commandlineArgs.toList());
-        assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
+        assertEquals(argLine, builder.getArgLine(), "Serialized arg line not modified");
     }
 
     @Test
-    public void environmentAndBuildVariablesParsingWithEnvVarsThatReferencesBuildParameters() {
+    void environmentAndBuildVariablesParsingWithEnvVarsThatReferencesBuildParameters() {
         EnvVars vars = new EnvVars();
         vars.put("ARGS", "-projectPath $param");
 
         Map<String, String> buildParameters = new Hashtable<>();
         buildParameters.put("param", "XXXX");
 
-        argLine = "-p1 v1 $ARGS";
-        expectedArgs = asList(exe, "-p1", "v1", "-projectPath", "XXXX");
+        String argLine = "-p1 v1 $ARGS";
+        List<String> expectedArgs = asList(EXE, "-p1", "v1", "-projectPath", "XXXX");
 
         Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, "");
         ArgumentListBuilder commandlineArgs =
-                builder.createCommandlineArgs(exe, moduleRootRemote, vars, buildParameters);
+                builder.createCommandlineArgs(EXE, MODULE_ROOT_REMOTE, vars, buildParameters);
         assertEquals(expectedArgs, commandlineArgs.toList());
-        assertEquals("Serialized arg line not modified", argLine, builder.getArgLine());
+        assertEquals(argLine, builder.getArgLine(), "Serialized arg line not modified");
     }
 
     @Test
-    public void unstableErrorCodesParsing() throws Exception {
+    void unstableErrorCodesParsing() {
         ensureUnstableReturnCodesParsingWorks(new Integer[] {}, "");
         ensureUnstableReturnCodesParsingWorks(new Integer[] {2, 3}, "2,3");
         ensureUnstableReturnCodesParsingWorks(new Integer[] {-1}, "-1");
@@ -125,17 +123,12 @@ public class Unity3dBuilderTest {
     }
 
     private void ensureUnstableReturnCodesParsingWorks(Integer[] expectedResultCodes, String unstableReturnCodes) {
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, unstableReturnCodes);
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", null, unstableReturnCodes);
         assertEquals(new HashSet<>(asList(expectedResultCodes)), builder.toUnstableReturnCodesSet());
     }
 
     private void ensureUnstableReturnCodesParsingFails(String unstableReturnCodes) {
-        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", argLine, unstableReturnCodes);
-        try {
-            builder.toUnstableReturnCodesSet();
-            Assert.fail("Expected failure");
-        } catch (Exception expected) {
-            //
-        }
+        Unity3dBuilder builder = new Unity3dBuilder("Unity 3.5", null, unstableReturnCodes);
+        assertThrows(Exception.class, builder::toUnstableReturnCodesSet);
     }
 }
