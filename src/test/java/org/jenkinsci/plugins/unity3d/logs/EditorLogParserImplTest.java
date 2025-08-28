@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
 import org.jenkinsci.plugins.unity3d.logs.line.Line;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,13 +14,13 @@ import org.junit.Test;
  * Time: 8:11 AM
  * To change this template use File | Settings | File Templates.
  */
-public class EditorLogParserImplTest {
-    private EditorLogParserImpl parser = new EditorLogParserImpl();
-    private EditorLogParserImpl.LogListener listener;
+class EditorLogParserImplTest {
+
+    private static final EditorLogParserImpl PARSER = new EditorLogParserImpl();
 
     @Test
-    public void testLog() throws Exception {
-        listener = new EditorLogParserImpl.LogListener() {
+    void testLog() throws Exception {
+        EditorLogParserImpl.LogListener listener = new EditorLogParserImpl.LogListener() {
             public void activityStarted(MatchedBlock block) {
                 System.out.println("BLOCK START: " + block.getName());
             }
@@ -30,17 +30,19 @@ public class EditorLogParserImplTest {
             }
 
             public void logMessage(String line, Line.Type type) {
-                if (type != Line.Type.Normal) System.out.println("=== " + type + " => " + line);
+                if (type != Line.Type.Normal) {
+                    System.out.println("=== " + type + " => " + line);
+                }
             }
         };
-        parser.setListener(listener);
-        InputStream is = findResource("/example_Editor.log");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            parser.log(line);
+        PARSER.setListener(listener);
+        try (InputStream is = findResource("/example_Editor.log");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                PARSER.log(line);
+            }
         }
-        is.close();
     }
 
     private InputStream findResource(String resourceName) {

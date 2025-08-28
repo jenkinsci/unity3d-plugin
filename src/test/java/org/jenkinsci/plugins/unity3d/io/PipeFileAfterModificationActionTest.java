@@ -1,51 +1,49 @@
 package org.jenkinsci.plugins.unity3d.io;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.util.ByteArrayOutputStream2;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicLong;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jerome Lacoste
  */
-public class PipeFileAfterModificationActionTest {
-    private String originalContent =
+class PipeFileAfterModificationActionTest {
+
+    private static final String ORIGINAL_CONTENT =
             """
             The original content of the file
             Multiple lines of\s
             Build information""";
 
-    private String newContent =
+    private static final String NEW_CONTENT =
             """
             The new content of the file
             Multiple lines of\s
             """;
 
-    private String newContent2 = "Build information";
-
-    public static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private static final String NEW_CONTENT_2 = "Build information";
 
     @Test
-    public void simulateEditorLogRewritten() throws Exception {
+    void simulateEditorLogRewritten() throws Exception {
         testRewriteFile(0);
     }
 
     @Test
-    public void simulateEditorLogSlowlyMoved() throws Exception {
+    void simulateEditorLogSlowlyMoved() throws Exception {
         testRewriteFile(100);
     }
 
-    private void testRewriteFile(int timeToWaitAfterRename) throws IOException, InterruptedException {
+    private void testRewriteFile(int timeToWaitAfterRename) throws Exception {
         // Given
         File fakeEditorLog = File.createTempFile("fake_editor", "log");
-        Files.writeString(fakeEditorLog.toPath(), originalContent, StandardCharsets.UTF_8);
+        Files.writeString(fakeEditorLog.toPath(), ORIGINAL_CONTENT, StandardCharsets.UTF_8);
 
         ByteArrayOutputStream2 collectedContent = new ByteArrayOutputStream2();
 
@@ -69,11 +67,11 @@ public class PipeFileAfterModificationActionTest {
 
         Thread.sleep(timeToWaitAfterRename);
 
-        Files.writeString(fakeEditorLog.toPath(), newContent, StandardCharsets.UTF_8);
+        Files.writeString(fakeEditorLog.toPath(), NEW_CONTENT, StandardCharsets.UTF_8);
         Thread.sleep(20);
-        Files.writeString(fakeEditorLog.toPath(), newContent2, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+        Files.writeString(fakeEditorLog.toPath(), NEW_CONTENT_2, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         Thread.sleep(80);
-        String expectedContent = newContent + newContent2;
+        String expectedContent = NEW_CONTENT + NEW_CONTENT_2;
 
         // simulate remote cancellation. Using the remoting API, we cancel the task and this interrupts the remote
         // thread
@@ -81,7 +79,7 @@ public class PipeFileAfterModificationActionTest {
         // give us the time to terminate properly the task
         Thread.sleep(50);
 
-        assertEquals(expectedContent, new String(collectedContent.getBuffer(), UTF_8));
+        assertEquals(expectedContent, new String(collectedContent.getBuffer(), StandardCharsets.UTF_8));
 
         Long read = (long) expectedContent.length();
         assertEquals(read, (Long) nbBytesRead.get());
