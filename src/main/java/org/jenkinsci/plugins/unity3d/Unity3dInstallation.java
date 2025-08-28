@@ -1,12 +1,13 @@
 package org.jenkinsci.plugins.unity3d;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.EnvironmentSpecific;
-import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.slaves.NodeSpecific;
@@ -15,11 +16,6 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.FormValidation;
-import jenkins.security.MasterToSlaveCallable;
-import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,14 +23,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
+import org.jenkinsci.plugins.unity3d.io.PipeFileAfterModificationAction;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Represents a Unity3d installation (name, home_dir, etc.)
  *
  * @author Jerome Lacoste
  */
-public class Unity3dInstallation
-        extends ToolInstallation
+public class Unity3dInstallation extends ToolInstallation
         implements EnvironmentSpecific<Unity3dInstallation>, NodeSpecific<Unity3dInstallation> {
 
     private static final Logger log = Logger.getLogger(Unity3dInstallation.class.getName());
@@ -44,21 +44,25 @@ public class Unity3dInstallation
         super(name, home, properties);
     }
 
-    public Unity3dInstallation(final Unity3dInstallation source, final String home, final List<? extends ToolProperty<?>> properties) {
+    public Unity3dInstallation(
+            final Unity3dInstallation source, final String home, final List<? extends ToolProperty<?>> properties) {
         super(source.getName(), home, properties);
     }
 
     public Unity3dInstallation forEnvironment(EnvVars env) {
-        return new Unity3dInstallation(this, env.expand(getHome()), getProperties().toList());
+        return new Unity3dInstallation(
+                this, env.expand(getHome()), getProperties().toList());
     }
 
-    public Unity3dInstallation forNode(Node node, TaskListener log) throws IOException, InterruptedException {
-        return new Unity3dInstallation(this, translateFor(node, log), getProperties().toList());
+    public Unity3dInstallation forNode(@NonNull Node node, TaskListener log) throws IOException, InterruptedException {
+        return new Unity3dInstallation(
+                this, translateFor(node, log), getProperties().toList());
     }
 
     /**
      * Gets the executable path of this Unity3dBuilder on the given target system.
      */
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public String getExecutable(Launcher launcher) throws IOException, InterruptedException {
         return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
@@ -81,7 +85,8 @@ public class Unity3dInstallation
         static Unity3dExecutablePath check(String home) {
             File value = new File(home);
             File unityExe = getExeFile(value);
-            log.fine("home " + home + " value " + value + " exe " + unityExe + " path abs " + unityExe.getAbsolutePath() + " path " + unityExe.getPath());
+            log.fine("home " + home + " value " + value + " exe " + unityExe + " path abs " + unityExe.getAbsolutePath()
+                    + " path " + unityExe.getPath());
             String path = unityExe.getPath(); // getAbsolutePath
             boolean exists = value.isDirectory() && unityExe.exists();
             return new Unity3dExecutablePath(home, path, exists);
@@ -118,7 +123,6 @@ public class Unity3dInstallation
         return install.path;
     }
 
-
     /**
      * Create a long running task that pipes the Unity3d editor.log into the specified pipe.
      * <p>
@@ -128,10 +132,14 @@ public class Unity3dInstallation
      * @return the number of bytes read
      * @throws IOException
      */
-    public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFile, final OutputStream ros) throws IOException {
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    public Future<Long> pipeEditorLog(final Launcher launcher, final String customLogFile, final OutputStream ros)
+            throws IOException {
         return launcher.getChannel().callAsync(new MasterToSlaveCallable<Long, IOException>() {
             public Long call() throws IOException {
-                return new PipeFileAfterModificationAction(getEditorLogFile(customLogFile).getAbsolutePath(), ros, true).call();
+                return new PipeFileAfterModificationAction(
+                                getEditorLogFile(customLogFile).getAbsolutePath(), ros, true)
+                        .call();
             }
         });
     }
@@ -143,7 +151,9 @@ public class Unity3dInstallation
      * @throws IOException
      * @throws InterruptedException
      */
-    public String getEditorLogPath(final Launcher launcher, final String customLogFile) throws IOException, InterruptedException {
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    public String getEditorLogPath(final Launcher launcher, final String customLogFile)
+            throws IOException, InterruptedException {
         return launcher.getChannel().call(new MasterToSlaveCallable<String, IOException>() {
             public String call() throws IOException {
                 return getEditorLogFile(customLogFile).getAbsolutePath();
@@ -167,7 +177,8 @@ public class Unity3dInstallation
                 localAppData = EnvVars.masterEnvVars.get("LOCALAPPDATA");
                 log.fine("Found %LOCALAPPDATA% (from environment variable) under " + localAppData);
                 if (localAppData == null) {
-                    throw new RuntimeException("Empty LOCALAPPDATA environment variable. Use -logFile command line argument as workaround. Unable to find Editor.log location (see JENKINS-24265).");
+                    throw new RuntimeException(
+                            "Empty LOCALAPPDATA environment variable. Use -logFile command line argument as workaround. Unable to find Editor.log location (see JENKINS-24265).");
                 }
             }
             File applocaldata = new File(localAppData);
@@ -185,6 +196,7 @@ public class Unity3dInstallation
     public static class DescriptorImpl extends ToolDescriptor<Unity3dInstallation> {
 
         @Override
+        @NonNull
         public String getDisplayName() {
             return "Unity3d";
         }
@@ -192,12 +204,16 @@ public class Unity3dInstallation
         // for compatibility reasons, the persistence is done by Unity3dBuilder.DescriptorImpl
         @Override
         public Unity3dInstallation[] getInstallations() {
-            return Hudson.getInstance().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).getInstallations();
+            return Jenkins.get()
+                    .getDescriptorByType(Unity3dBuilder.DescriptorImpl.class)
+                    .getInstallations();
         }
 
         @Override
         public void setInstallations(Unity3dInstallation... installations) {
-            Hudson.getInstance().getDescriptorByType(Unity3dBuilder.DescriptorImpl.class).setInstallations(installations);
+            Jenkins.get()
+                    .getDescriptorByType(Unity3dBuilder.DescriptorImpl.class)
+                    .setInstallations(installations);
         }
 
         @Override
@@ -210,17 +226,15 @@ public class Unity3dInstallation
          */
         public FormValidation doCheckHome(@QueryParameter String value) {
             // this can be used to check the existence of a file on the server, so needs to be protected
-            if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
-                return FormValidation.ok();
+            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) return FormValidation.ok();
 
-            if (value.equals(""))
-                return FormValidation.ok();
+            if (value.isEmpty()) return FormValidation.ok();
 
             String unityHome = Util.replaceMacro(value, EnvVars.masterEnvVars);
             log.fine("UNITY_HOME:" + unityHome);
             Unity3dExecutablePath install = Unity3dExecutablePath.check(unityHome);
 
-            if (! install.isVariableExpanded()) {
+            if (!install.isVariableExpanded()) {
                 return FormValidation.ok(install.getParametrizedInstallMessage());
             } else if (!install.exists) {
                 return FormValidation.error(install.getInvalidInstallMessage());
@@ -232,5 +246,4 @@ public class Unity3dInstallation
             return FormValidation.validateRequired(value);
         }
     }
-
 }

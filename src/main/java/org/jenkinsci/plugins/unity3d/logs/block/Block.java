@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.unity3d.logs.block;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * A matchable block of text
  */
@@ -13,15 +12,13 @@ public class Block {
     protected String name;
     protected MatchType beginMatchType = MatchType.Inclusive;
     protected MatchType endMatchType = MatchType.Inclusive;
- 
+
     protected Pattern beginPattern;
     protected Pattern endPattern;
     protected Matcher beginMatcher;
     protected Matcher endMatcher;
-           
-    
-    public void init()
-    {
+
+    public void init() {
         beginPattern = Pattern.compile(beginning);
         endPattern = Pattern.compile(end);
         beginMatcher = beginPattern.matcher("");
@@ -34,9 +31,7 @@ public class Block {
         Exclusive
     }
 
-    
-    protected MatchedBlock newMatchBlock(Matcher matcher, String message)
-    {
+    protected MatchedBlock newMatchBlock(Matcher matcher, String message) {
         String blockName = name;
         if (matcher.groupCount() > 0) {
             blockName = name + ": " + matcher.group(1);
@@ -55,10 +50,8 @@ public class Block {
 
     public MatchType matchesEnd(String message) {
         endMatcher.reset(message);
-        if (endMatcher.matches())
-            return endMatchType;
-        else
-            return MatchType.None;
+        if (endMatcher.matches()) return endMatchType;
+        else return MatchType.None;
     }
 
     public String getName() {

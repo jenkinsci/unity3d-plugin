@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.unity3d.logs.line;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -10,13 +9,15 @@ import java.util.List;
  * Time: 16:51
  */
 public class UnityLineList {
-    public static List<Line> lines = Arrays.asList(
+    public static final List<Line> lines = List.of(
 
             // Warnings
             new Line("Script attached to.*?is missing or no valid script is attached.", Line.Type.Warning),
             new Line(".*?warning CS\\d+.*?", Line.Type.Warning),
             new Line("There are inconsistent line endings in the.*?", Line.Type.Warning),
-            new Line("This might lead to incorrect line numbers in stacktraces and compiler errors.*?", Line.Type.Warning),
+            new Line(
+                    "This might lead to incorrect line numbers in stacktraces and compiler errors.*?",
+                    Line.Type.Warning),
             new Line("WARNING.*", Line.Type.Warning),
 
             // Errors

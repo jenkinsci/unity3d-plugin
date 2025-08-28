@@ -14,5 +14,4 @@ public class CompileBlock extends Block {
 
         name = "Compile";
     }
-
 }

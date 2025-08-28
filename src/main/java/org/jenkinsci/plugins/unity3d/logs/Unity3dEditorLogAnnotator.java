@@ -23,21 +23,22 @@
  */
 package org.jenkinsci.plugins.unity3d.logs;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.console.LineTransformationOutputStream;
-import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
-import org.jenkinsci.plugins.unity3d.logs.line.Line;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
+import org.jenkinsci.plugins.unity3d.logs.line.Line;
 
 /**
  * Filter {@link java.io.OutputStream} that places an annotation that marks Ant target execution.
  *
  * @author Jerome Lacoste
  */
-public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream implements EditorLogParserImpl.LogListener {
+public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream
+        implements EditorLogParserImpl.LogListener {
     private final OutputStream out;
     private final Charset charset;
 
@@ -49,18 +50,15 @@ public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream im
         this.logParser = new EditorLogParserImpl();
     }
 
-    public void activityStarted(MatchedBlock block) {
-        
-    }
+    public void activityStarted(MatchedBlock block) {}
 
-    public void activityFinished(MatchedBlock block) {
-        
-    }
+    public void activityFinished(MatchedBlock block) {}
 
+    @SuppressFBWarnings(value = "UC_USELESS_VOID_METHOD", justification = "Legacy code")
     public void logMessage(String line, Line.Type type) {
         switch (type) {
             case Normal:
-                //out.write();
+                // out.write();
                 break;
             case Warning:
                 break;
@@ -79,17 +77,17 @@ public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream im
         line = trimEOL(line);
 
         handle(line);
-        
-        out.write(b,0,len);
+
+        out.write(b, 0, len);
     }
 
     private void handle(String line) {
-       logParser.log(line);
+        logParser.log(line);
     }
 
     private boolean endsWith(String line, char c) {
         int len = line.length();
-        return len>0 && line.charAt(len-1)==c;
+        return len > 0 && line.charAt(len - 1) == c;
     }
 
     @Override
@@ -97,5 +95,4 @@ public class Unity3dEditorLogAnnotator extends LineTransformationOutputStream im
         super.close();
         out.close();
     }
-
 }

@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.unity3d.logs.block;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -10,11 +9,10 @@ import java.util.List;
  * Time: 09:52
  */
 public class UnityBlockList {
-    static public List<Block> editorLogBlocks = Arrays.asList(
+    public static final List<Block> editorLogBlocks = List.of(
             new PlayerStatisticsBlock(),
             new CompileBlock(),
             new PrepareBlock(),
             new LightmapBlock(),
-            new UpdateBlock()
-    );
+            new UpdateBlock());
 }

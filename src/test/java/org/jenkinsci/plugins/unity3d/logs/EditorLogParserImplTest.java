@@ -1,12 +1,11 @@
 package org.jenkinsci.plugins.unity3d.logs;
 
-import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
-import org.jenkinsci.plugins.unity3d.logs.line.Line;
-import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.jenkinsci.plugins.unity3d.logs.block.MatchedBlock;
+import org.jenkinsci.plugins.unity3d.logs.line.Line;
+import org.junit.Test;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,8 +30,7 @@ public class EditorLogParserImplTest {
             }
 
             public void logMessage(String line, Line.Type type) {
-                if (type != Line.Type.Normal)
-                    System.out.println("=== " + type + " => " + line);
+                if (type != Line.Type.Normal) System.out.println("=== " + type + " => " + line);
             }
         };
         parser.setListener(listener);

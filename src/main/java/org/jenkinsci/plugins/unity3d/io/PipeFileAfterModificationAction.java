@@ -2,9 +2,10 @@ package org.jenkinsci.plugins.unity3d.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 /**
@@ -78,7 +79,8 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
                 closeOutIfNecessary();
             }
         } else {
-            writeMessagesToOutput("\nWARNING: No change detected to Editor.log path: '" + path + "'.",
+            writeMessagesToOutput(
+                    "\nWARNING: No change detected to Editor.log path: '" + path + "'.",
                     "\tThe unity3d plugin was probably unable to find it in its expected locations (see JENKINS-24265).",
                     "\tConsider using the -logFile argument to force a known editor.log path or report the issue.");
             closeOutIfNecessary();
@@ -87,27 +89,20 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
     }
 
     private void closeOutIfNecessary() throws IOException {
-        if (closeOut)
-            out.close();
+        if (closeOut) out.close();
     }
 
     private void writeMessagesToOutput(String... msgs) {
-        PrintStream printStream = new PrintStream(out);
-        try {
+        try (PrintStream printStream = new PrintStream(out, false, StandardCharsets.UTF_8)) {
             for (String msg : msgs) {
                 printStream.println(msg);
             }
-        } finally {
-            printStream.close();
         }
     }
 
     private void forcePrintStacktrace(Throwable t) {
-        PrintStream printStream = new PrintStream(out);
-        try {
+        try (PrintStream printStream = new PrintStream(out, false, StandardCharsets.UTF_8)) {
             t.printStackTrace(printStream);
-        } finally {
-            printStream.close();
         }
     }
 
@@ -116,10 +111,8 @@ public class PipeFileAfterModificationAction implements Callable<Long> {
 
         byte[] buf = new byte[8192];
         int len;
-        while ((len = raf.read(buf)) > 0)
-            out.write(buf, 0, len);
+        while ((len = raf.read(buf)) > 0) out.write(buf, 0, len);
 
         return raf.getFilePointer();
     }
-
 }
